@@ -26,6 +26,14 @@ def main():
     
     try:
         with open(file_path, 'rb') as f:
+            # Check XBE file header
+            magic = f.read(4)
+            if len(magic) != 4:
+                raise ValueError("Unexpected read error at 0x0")
+            if magic != b"XBEH":
+                print(f"Error: Not a valid XBE file")
+                sys.exit(1)
+            
             # Read memory address
             f.seek(0x104)
             mem_offset = f.read(4)
