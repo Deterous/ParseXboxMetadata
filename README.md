@@ -30,8 +30,6 @@ Parses Xbox and Xbox360 DMI sector for its useful metadata, e.g.
 System: Xbox (XGD1)
 XMID: MS10010W
 DMI Timestamp: 2004-09-30 17:38:25674749
-DMI trailer: blank
-Check: No unusual values detected!
 ```
 ```
 System: Xbox 360 (XGD2/3)
@@ -41,5 +39,4 @@ Media ID:  33EAD0291EE79C1DFE5B6B3F638DA23A
 XeMID: AV207903J0X11
 PFI CRC: 05C6C409
 Xbox Signature: Valid
-Check: No unusual values detected!
 ```
