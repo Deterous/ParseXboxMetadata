@@ -73,7 +73,7 @@ def parse_ss(data, xgd, verbose):
         if data[0x104:0x108] != bytes([0x00, 0x00, 0x06, 0xE0]):
             print(f"Unexpected Unknown2 Value: {int.from_bytes(data[0x104:0x108], 'big'):08X}")
     
-    if xgd == 3:
+    if xgd > 2:
         print(f"Unknown1 Value: {int.from_bytes(data[0x100:0x104], 'big'):08X}")
         if data[0x104:0x108] != bytes([0x00, 0x00, 0x18, 0x80]):
             print(f"[WARNING] Unexpected Unknown2 Value: {int.from_bytes(data[0x104:0x108], 'big'):08X}")
@@ -90,8 +90,12 @@ def parse_ss(data, xgd, verbose):
                     print(f"Challenge Response #{i:02}: 0x{hex_str}")
         print(f"Challenge Responses: {response_count}")
     
-    cpr_mai = int.from_bytes(data[0x2D0:0x2D4], byteorder='big')
-    print(f"CPR_MAI Key: {cpr_mai:08X}")
+    if xgd == 4:
+        cpr_mai = int.from_bytes(data[0x0F0:0x0F5], byteorder='big')
+        print(f"CPR_MAI Key: {cpr_mai:08X}")
+    else:
+        cpr_mai = int.from_bytes(data[0x2D0:0x2D4], byteorder='big')
+        print(f"CPR_MAI Key: {cpr_mai:08X}")
     
     if (xgd == 1 and data[0x300] != 1) or (xgd > 1 and data[0x300] != 2):
         print(f"Unexpected CCRT Version: 0x{data[0x300]:02X}")
@@ -265,6 +269,32 @@ def main():
             print("[ERROR] Could not detect XGD version")
             return
         
+        if data[0x010:0x100] != b'\x00' * 240:
+            if xgd == 3:
+                xgd = 4
+                print("XGD3 with SSv2")
+            else:
+                print(f"[WARNING] XGD{xgd} SS with non-zero data in SSv2 area")
+        elif xgd == 3:
+            print("XGD3 with SSv1")
+        
+        if xgd == 2:
+            if data[552] == 0x01 and data[553] == 0x00 and data[555] == 0x00 and data[556] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[564] == 0x00 and data[565] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[573] == 0x00 and data[574] == 0x00 and data[579] == 0x0F and data[580] == 0x01 and data[582] == 0x00 and data[583] == 0x00:
+                print("XGD2: Clean")
+            else:
+                print("XGD2: Not Clean")
+        elif xgd == 3:
+            if data[552] == 0x01 and data[553] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[579] == 0x0F and data[580] == 0x00:
+                print("XGD3 SSv1: Clean")
+            else:
+                print("XGD3 SSv1: Not Clean")
+        elif xgd == 4:
+            if data[72] == 0x01 and data[73] == 0x00 and data[75] == 0x01 and data[76] == 0x00 and data[81] == 0x5B and data[82] == 0x00 and data[84] == 0x5B and data[85] == 0x00 and data[90] == 0xB5 and data[91] == 0x00 and data[93] == 0xB5 and data[94] == 0x00 and data[99] == 0x0F and data[100] == 0x01 and data[102] == 0x0F and data[103] == 0x01:
+                print("XGD3 SSv2: Clean")
+            else:
+                print("XGD3 SSv2: Not Clean")
+            
+        
         parse_pfi(data, xgd)
         
         parse_ss(data, xgd, verbose)
@@ -279,7 +309,7 @@ def main():
             all_zero = all(data[start:end] == b'\x00' * (end - start) for start, end in empty_ranges)
             if not all_zero:
                 print("[WARNING] Unexpected data in reserved bytes")
-        elif xgd == 3:
+        elif xgd > 2:
             empty_ranges = [(0x011, 0x01B), (0x01C, 0x020), (0x0F5, 0x0FF), (0x302, 0x304), (0x400, 0x460), (0x470, 0x49E), (0x4A7, 0x4BA), (0x5EB, 0x5FA), (0x7FF, 0x800)]
             all_zero = all(data[start:end] == b'\x00' * (end - start) for start, end in empty_ranges)
             if not all_zero:
