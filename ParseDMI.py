@@ -6,10 +6,13 @@ def print_filetime(data):
     filetime = int.from_bytes(data[0x010:0x018], "little")
     time = divmod(filetime - 0x19DB1DED53E8000, 10000000)
     time = datetime.datetime.fromtimestamp(time[0], datetime.UTC).replace(microsecond=time[1] // 10)
-    print(f"DMI Timestamp: {time.strftime(f"%Y-%m-%d %H:%M:%S%f")}")
+    if time.strftime(f"%H:%M:%S%f") == "00:00:00000000":
+        print(f"DMI Date: {time.strftime(f"%Y-%m-%d")}")
+    else:
+        print(f"DMI Datetime: {time.strftime(f"%Y-%m-%d %H:%M:%S%f")}")
 
 
-def print_trailer(data):
+def print_trailer(data, verbose):
     pfi = data[0x7DC:0x7E4]
     
     pfi_map = {
@@ -38,16 +41,28 @@ def print_trailer(data):
     
     xbox = data[0x7E4:0x7F0]
     if xbox == bytes.fromhex('0002000058424F5800000000'):
-        print("Xbox Signature: Valid")
+        if verbose:
+            print("Xbox Signature: Valid")
     else:
         print("Xbox Signature: Invalid")
+    
+    if verbose:
+        print(f"Final Checksum: {int.from_bytes(data[0x7F0:0x800], 'big'):016X}")
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python ParseDMI.py <filename>")
+    if len(sys.argv) != 2 and len(sys.argv) != 3:
+        print("Usage: python ParseDMI.py <filename> [-v, --verbose]")
+        return
     
+    verbose = False
     filename = sys.argv[1]
+    if len(sys.argv) == 3:
+        if filename == "-v" or filename =="--verbose":
+            verbose = True
+            filename = sys.argv[2]
+        elif sys.argv[2] == "-v" or sys.argv[2] == "--verbose":
+            verbose = True
     
     with open(filename, 'rb') as f:
         data = f.read(2048)
@@ -64,12 +79,14 @@ def main():
             print_filetime(data)
             
             if data[0x634:0x800] != b'\x00' * 460:
-                print_trailer(data)
+                print_trailer(data, verbose)
             
             empty_ranges = [(0x001, 0x008), (0x019, 0x634)]
             all_zero = all(data[start:end] == b'\x00' * (end - start) for start, end in empty_ranges)
-            if not all_zero:
-                print("Unexpected data in reserved bytes")
+            if all_zero and verbose:
+                print("All reserved bytes zeroed")
+            elif not all_zero:
+                print("Warning: Unexpected data in reserved bytes")
         
         elif data[0] == 0x02:
             print("System: Xbox 360 (XGD2/3)")
@@ -85,17 +102,20 @@ def main():
                 print(f"XOR Key: {key_id}")
             
             media_id = data[0x20:0x30]
-            print("Media ID: ", ''.join(f"{b:02X}" for b in media_id))
+            media_id_str = ''.join(f"{b:02X}" for b in media_id)
+            print(f"Media ID: {media_id_str[:-8] + '-' + media_id_str[-8:]}")
             
             xemid = data[0x40:0x50].split(b'\x00')[0].decode(errors='ignore')
             print(f"XeMID: {xemid}")
             
-            print_trailer(data)
+            print_trailer(data, verbose)
             
             empty_ranges = [(0x001, 0x010), (0x19, 0x20), (0x30, 0x40), (0x50, 0x634)]
             all_zero = all(data[start:end] == b'\x00' * (end - start) for start, end in empty_ranges)
-            if not all_zero:
-                print("Unexpected data in reserved bytes")
+            if all_zero and verbose:
+                print("All reserved bytes zeroed")
+            elif not all_zero:
+                print("Warning: Unexpected data in reserved bytes")
         
         else:
             print(f"Error: Not a valid Xbox DMI: First byte is 0x{data[0]:02X}")
