@@ -67,7 +67,7 @@ def main():
     with open(filename, 'rb') as f:
         data = f.read(2048)
         if len(data) < 2048:
-            print("Error: Not a valid XGD2 DMI")
+            print("[ERROR] Not a valid XGD2 DMI")
             return
         
         if data[0] == 0x01:
@@ -86,7 +86,7 @@ def main():
             if all_zero and verbose:
                 print("All reserved bytes zeroed")
             elif not all_zero:
-                print("Warning: Unexpected data in reserved bytes")
+                print("[WARNING] Unexpected data in reserved bytes")
         
         elif data[0] == 0x02:
             print("System: Xbox 360 (XGD2/3)")
@@ -115,16 +115,16 @@ def main():
             if all_zero and verbose:
                 print("All reserved bytes zeroed")
             elif not all_zero:
-                print("Warning: Unexpected data in reserved bytes")
+                print("[WARNING] Unexpected data in reserved bytes")
         
         else:
-            print(f"Error: Not a valid Xbox DMI: First byte is 0x{data[0]:02X}")
+            print(f"[ERROR] Not a valid Xbox DMI: First byte is 0x{data[0]:02X}")
             return
 
 if __name__ == "__main__":
     try:
         main()
     except FileNotFoundError:
-        print(f"Error: File '{filename}' not found.")
+        print(f"[ERROR] File file not found.")
     except Exception as e:
         print(f"An error occurred: {e}")
