@@ -20,16 +20,26 @@ Certificate Version: 2
 
 ---
 
-# ParseXbox360DMI
+# ParseDMI
 
-`python ParseXbox360DMI.py <filename>`
+`python ParseDMI.py <filename>`
 
-Parses Xbox360 DMI sector for its useful metadata, e.g.
+Parses Xbox and Xbox360 DMI sector for its useful metadata, e.g.
 
 ```
-DMI Timestamp: 2006-03-28 00:00:00000000
+System: Xbox (XGD1)
+XMID: MS10010W
+DMI Timestamp: 2004-09-30 17:38:25674749
+DMI trailer: blank
+Check: No unusual values detected!
+```
+```
+System: Xbox 360 (XGD2/3)
+DMI Timestamp: 2010-10-18 00:00:00000000
 XOR Key: Retail
-Media ID:  40B0EEAD944B37F3C5428DAA2F576731
-XeMID: EA202207J0X11
+Media ID:  33EAD0291EE79C1DFE5B6B3F638DA23A
+XeMID: AV207903J0X11
+PFI CRC: 05C6C409
+Xbox Signature: Valid
 Check: No unusual values detected!
 ```
