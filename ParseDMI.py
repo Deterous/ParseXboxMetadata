@@ -52,7 +52,7 @@ def main():
     with open(filename, 'rb') as f:
         data = f.read(2048)
         if len(data) < 2048:
-            print("Error: Not a valid XGD2 DMI")
+            print("Error: Not a valid DMI: <2048 bytes")
             return
         
         if data[0] == 0x01:
