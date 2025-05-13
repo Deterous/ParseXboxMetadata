@@ -91,7 +91,7 @@ def parse_ss(data, xgd, verbose):
         print(f"Challenge Responses: {response_count}")
     
     if xgd == 4:
-        cpr_mai = int.from_bytes(data[0x0F0:0x0F5], byteorder='big')
+        cpr_mai = int.from_bytes(data[0x0F0:0x0F4], byteorder='big')
         print(f"CPR_MAI Key: {cpr_mai:08X}")
     else:
         cpr_mai = int.from_bytes(data[0x2D0:0x2D4], byteorder='big')
