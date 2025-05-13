@@ -118,9 +118,7 @@ def parse_ss(data, xgd, verbose):
         else:
             print(f"Creation Timestamp: {creation_time}")
         
-        cert = False
         if data[0x427:0x437] != b'\x00' * 16:
-            cert = True
             if verbose:
                 print(f"Certificate Hash: {int.from_bytes(data[0x427:0x437], 'big'):016X}")
         
@@ -137,7 +135,8 @@ def parse_ss(data, xgd, verbose):
         print(f"enCrypted Challenge Responses: {enc_response_count}")
         
         media_id = data[0x460:0x470]
-        print("Media ID: ", ''.join(f"{b:02X}" for b in media_id))
+        media_id_str = ''.join(f"{b:02X}" for b in media_id)
+        print(f"Media ID: {media_id_str[:-8] + '-' + media_id_str[-8:]}")
         
         if data[0x49E] != 0x04:
             print(f"[WARNING] Unexpected value at 0x49E: 0x{data[0x49E]:02X}")
@@ -149,11 +148,9 @@ def parse_ss(data, xgd, verbose):
         print(f"Authoring Timestamp: {authoring_time}")
     
     if xgd == 1:
-        if cert and data[0x4A7:0x4AB] == b'\x00' * 4:
-            print("[WARNING] Unexpected zeroed Certificate Timestamp")
-        elif not cert and data[0x4A7:0x4AB] != b'\x00' * 4:
-            cert_time = time_t(data[0x4A7:0x4AB])
-            print(f"[WARNING] Unexpected Certificate Timestamp: {cert_time}")
+        if data[0x4A7:0x4AB] == b'\x00' * 4:
+            if verbose:
+                print("Zeroed Certificate Timestamp")
         else:
             cert_time = time_t(data[0x4A7:0x4AB])
             print(f"Certificate Timestamp: {cert_time}")
@@ -269,7 +266,7 @@ def main():
             print("[ERROR] Could not detect XGD version")
             return
         
-        if data[0x010:0x100] != b'\x00' * 240:
+        if data[32:104] != b'\x00' * 72:
             if xgd == 3:
                 xgd = 4
                 print("XGD3 with SSv2")
