@@ -1,3 +1,14 @@
+This repository has scripts that read, validate and parse metadata from the following files:
+- XBE (XBox eXecutable), Xbox only
+    - XBE files (`filename.xbe`) can be extracted from Xbox game partitions, using programs such as [extract-xiso](https://github.com/XboxDev/extract-xiso) or [NKit2](https://github.com/Nanook/NKit)
+- DMI (Disc Manufacturing Information sector), Xbox and Xbox 360
+    - DMI files (e.g. `DMI.bin` or `filename.dmi`) can be obtained from the SCSI command READ DISC STRUCTURE using dumping programs such as [Redumper](https://github.com/superg/redumper), [DiscImageCreator](https://github.com/saramibreak/DiscImageCreator/), and XboxBackupCreator
+- SS (Security Sector), Xbox and Xbox 360
+    - SS files (e.g. `SS.bin` or `filename.ss`) can be obtained from specific disc drives using dumping programs such as [Redumper](https://github.com/superg/redumper), [DiscImageCreator](https://github.com/saramibreak/DiscImageCreator/), and XboxBackupCreator
+
+TODO:
+- XEX (Xbox 360 executable file)
+
 # ParseXBE
 
 `python ParseXBE.py <filename.xbe>`
@@ -18,8 +29,6 @@ Disc Number: 0
 Certificate Version: 2
 ```
 
----
-
 # ParseDMI
 
 `python ParseDMI.py <filename> [-v, --verbose]`
@@ -39,8 +48,6 @@ Media ID: 4F24FBB52FD1F0B37DC7ACDE-4CB283E9
 XeMID: MS232924W0AF11
 PFI CRC: 26AF4C58
 ```
-
----
 
 # ParseSS
 
