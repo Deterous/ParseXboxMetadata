@@ -278,6 +278,13 @@ def main():
         
         clean_ss = bytearray(data)
         abgx_ss = bytearray(data)
+        if xgd == 2 or xgd == 3:
+            for i in range(0x200, 0x300):
+                abgx_ss[i] = 0xFF
+        elif xgd == 4:
+            for i in range(0x20, 0xF4):
+                abgx_ss[i] = 0xFF
+        
         if xgd == 2:
             if data[552] == 0x01 and data[553] == 0x00 and data[555] == 0x00 and data[556] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[564] == 0x00 and data[565] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[573] == 0x00 and data[574] == 0x00 and data[579] == 0x0F and data[580] == 0x01 and data[582] == 0x00 and data[583] == 0x00:
                 print("XGD2: Clean")
@@ -299,22 +306,6 @@ def main():
                 clean_ss[580] = 0x01
                 clean_ss[582] = 0x00
                 clean_ss[583] = 0x00
-                abgx_ss[552] = 0x00
-                abgx_ss[553] = 0x00
-                abgx_ss[555] = 0x00
-                abgx_ss[556] = 0x00
-                abgx_ss[561] = 0x00
-                abgx_ss[562] = 0x00
-                abgx_ss[564] = 0x00
-                abgx_ss[565] = 0x00
-                abgx_ss[570] = 0x00
-                abgx_ss[571] = 0x00
-                abgx_ss[573] = 0x00
-                abgx_ss[574] = 0x00
-                abgx_ss[579] = 0x00
-                abgx_ss[580] = 0x00
-                abgx_ss[582] = 0x00
-                abgx_ss[583] = 0x00
         elif xgd == 3:
             if data[552] == 0x01 and data[553] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[579] == 0x0F and data[580] == 0x00:
                 print("XGD3 SSv1: Clean")
@@ -328,14 +319,6 @@ def main():
                 clean_ss[571] = 0x00
                 clean_ss[579] = 0x0F
                 clean_ss[580] = 0x00
-                abgx_ss[552] = 0x00
-                abgx_ss[553] = 0x00
-                abgx_ss[561] = 0x00
-                abgx_ss[562] = 0x00
-                abgx_ss[570] = 0x00
-                abgx_ss[571] = 0x00
-                abgx_ss[579] = 0x00
-                abgx_ss[580] = 0x00
         elif xgd == 4:
             if data[72] == 0x01 and data[73] == 0x00 and data[75] == 0x01 and data[76] == 0x00 and data[81] == 0x5B and data[82] == 0x00 and data[84] == 0x5B and data[85] == 0x00 and data[90] == 0xB5 and data[91] == 0x00 and data[93] == 0xB5 and data[94] == 0x00 and data[99] == 0x0F and data[100] == 0x01 and data[102] == 0x0F and data[103] == 0x01:
                 print("XGD3 SSv2: Clean")
@@ -357,22 +340,6 @@ def main():
                 clean_ss[100] = 0x01
                 clean_ss[102] = 0x0F
                 clean_ss[103] = 0x01
-                abgx_ss[72] = 0x00
-                abgx_ss[73] = 0x00
-                abgx_ss[75] = 0x00
-                abgx_ss[76] = 0x00
-                abgx_ss[81] = 0x00
-                abgx_ss[82] = 0x00
-                abgx_ss[84] = 0x00
-                abgx_ss[85] = 0x00
-                abgx_ss[90] = 0x00
-                abgx_ss[91] = 0x00
-                abgx_ss[93] = 0x00
-                abgx_ss[94] = 0x00
-                abgx_ss[99] = 0x00
-                abgx_ss[100] = 0x00
-                abgx_ss[102] = 0x00
-                abgx_ss[103] = 0x00
         
         ss_crc = zlib.crc32(data)
         print(f"SS Hash: {ss_crc:8X}")
