@@ -1,6 +1,163 @@
 import sys
 import datetime
+import hashlib
 import zlib
+try:
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+except ImportError:
+    print("The 'cryptography' module is needed to decrypt the Challenge Response Table.")
+    print("Please install 'cryptography' using pip:")
+    print("python -m pip install cryptography")
+    raise
+
+
+def parse_ccrt(data, xgd, verbose):
+    if xgd == 1:
+        enc_response_count = 0
+        for i, offset in enumerate(range(0x302, 0x3FF, 11), start=1):
+            hex_str = ''.join(f'{b:02X}' for b in data[offset:offset + 11])
+            if hex_str != "0000000000000000000000":
+                enc_response_count = enc_response_count + 1
+        print(f"enCrypted Challenge Responses: {enc_response_count}")
+    else:
+        return
+    
+    hash_input = data[1183:1183+44]
+    sha1_hash = hashlib.sha1(hash_input).digest()
+    key = sha1_hash[:7]
+    
+    S = list(range(256))
+    j = 0
+    out = []
+
+    for i in range(256):
+        j = (j + S[i] + key[i % len(key)]) % 256
+        S[i], S[j] = S[j], S[i]
+
+    x = 0
+    y = 0
+    for pos in range(770, 770+253):
+        x = (x + 1) % 256
+        y = (y + S[x]) % 256
+        S[x], S[y] = S[y], S[x]
+        out.append(data[pos] ^ S[(S[x] + S[y]) % 256])
+    
+    if verbose:
+        print("Valid Decrypted Challenge Responses:")
+        for i in range(0, len(out), 11):
+            if out[i] == 0x01:
+                print(f"Challenge ID: {out[i+1]:02X}, Value: {int.from_bytes(bytearray(out[i+2:i+2+4]), 'big'):04X}, Response Modifier: {out[i+6]:02X}, Response: {int.from_bytes(bytearray(out[i+7:i+7+4]), 'big'):04X}")
+
+
+def parse_ccrt2(data, xgd, cpr_mai, verbose):
+    if xgd == 1:
+        return
+    elif xgd == 2:
+        offset = 0x200
+    elif xgd >= 3:
+        offset = 0x20
+    
+    key = bytes([0xD1, 0xE3, 0xB3, 0x3A, 0x6C, 0x1E, 0xF7, 0x70, 0x5F, 0x6D, 0xE9, 0x3B, 0xB6, 0xC0, 0xDC, 0x71])
+    iv = bytearray(16)
+    dcrt = bytearray(252)
+    cipher = Cipher(algorithms.AES(key), modes.ECB()).decryptor()
+    for i in range(15):
+        ct = bytes(data[0x304+i*16:0x304+(i+1)*16])
+        pt = bytearray(cipher.update(ct))
+        for j in range(16):
+            pt[j] ^= iv[j]
+        iv[:] = ct
+        dcrt[i*16 : (i+1)*16] = pt
+        
+    enc_response_count = 0
+    for i in range(0x304, 0x400, 12):
+        hex_str = ''.join(f'{b:02X}' for b in data[i:i+12])
+        if hex_str != "000000000000000000000000":
+            enc_response_count = enc_response_count + 1
+    
+    if enc_response_count != 21:
+        print("[WARNING] Unexpected encrypted challenge count: {enc_response_count}")
+    
+    if verbose:
+        print(f"Decrypted Challenges: {enc_response_count}")
+        print(f"{'CT':<4}{'CID':<4}{'Tol':<4}{'Type':<6}{'Challenge':<11}{'Response':<10}{'Angle':<8}")
+    
+    dcrtentry = []
+    CT01_conflict = False
+    CT01_count = 0
+    CT01_firstCD = bytearray(4)
+    for i in range(enc_response_count):
+        entry = {
+            "CT": dcrt[i*12],  # Challenge Type
+            "CID": dcrt[i*12+1],  # Challenge ID
+            "Tolerance": dcrt[i*12+2],
+            "Type": dcrt[i*12+3],
+            "CD": dcrt[i*12+4:i*12+8],
+            "Response": dcrt[i*12+8:i*12+12],
+            "angle": (dcrt[i*12+10] << 8) | dcrt[i*12+11],
+        }
+        dcrtentry.append(entry)
+        
+        if entry["CT"] == 0x01:
+            CT01_count += 1
+            if CT01_count == 1:
+                CT01_firstCD[:] = entry["CD"]
+            elif CT01_firstCD != entry["CD"]:
+                print("[WARNING] CT01 conflict")
+        
+        if entry['angle'] == 0 or entry['angle'] > 360:
+            entry['angle'] = ''
+        else:
+            entry['angle'] = f"{entry['angle']}°"
+        if verbose:
+            print(f"{entry['CT']:02X}  {entry['CID']:02X}  {entry['Tolerance']:02X}   {entry['Type']:02X}   "
+              f"{entry['CD'][0]:02X}{entry['CD'][1]:02X}{entry['CD'][2]:02X}{entry['CD'][3]:02X}   "
+              f"{entry['Response'][0]:02X}{entry['Response'][1]:02X}{entry['Response'][2]:02X}{entry['Response'][3]:02X}   "
+              f"{entry['angle']:<7}")
+    if not CT01_conflict and CT01_firstCD != cpr_mai:
+        print(f"[WARNING] CPR_MAI mismatch, CCRT contains: {int.from_bytes(CT01_firstCD, 'big'):04X}")
+    
+    response_count = 0
+    for i in range(offset, offset + 0xCF, 9):
+        hex_str = ''.join(f'{b:02X}' for b in data[i:i+9])
+        if hex_str != "000000000000000000":
+            response_count = response_count + 1
+    
+    if verbose:
+        print(f"Challenge Responses: {response_count}")
+        print(f"{'RT':<4}{'CID':<4}{'Mod':<5}{'Data':<15}{'Challenge':<11}{'Response':<11}")
+    
+    rtentry = []
+    for i in range(response_count):
+        entry = {
+            "RT": data[0x730+i*9],  # Response Type
+            "CID": data[0x730+i*9+1],  # Challenge ID
+            "Mod": data[0x730+i*9+2],
+            "Data": data[0x730+i*9+3:0x730+i*9+9],  # incl SS ranges
+            "CD": data[offset+i*9:offset+i*9+4],
+            "Response": data[offset+i*9+4:offset+i*9+9],
+            "angle": (data[offset+i*9+5] << 8) | data[offset+i*9+5],
+            "angle2": (data[offset+i*9+8] << 8) | data[offset+i*9+7],
+        }
+        rtentry.append(entry)
+        
+        if verbose:
+            print(f"{entry['RT']:02X}  {entry['CID']:02X}  {entry['Mod']:02X}   "
+              f"{entry['Data'][0]:02X}{entry['Data'][1]:02X}{entry['Data'][2]:02X}{entry['Data'][3]:02X}{entry['Data'][4]:02X}{entry['Data'][5]:02X}   "
+              f"{entry['CD'][0]:02X}{entry['CD'][1]:02X}{entry['CD'][2]:02X}{entry['CD'][3]:02X}   "
+              f"{entry['Response'][0]:02X}{entry['Response'][1]:02X}{entry['Response'][2]:02X}{entry['Response'][3]:02X}{entry['Response'][4]:02X}   ")
+    
+    for entry in rtentry:
+        for crt in dcrtentry:
+            if crt['CID'] == entry['CID']:
+                if (crt['CT'] == 0x15 and entry['RT'] != 0x01) or (crt['CT'] == 0x14 and entry['RT'] != 0x03) or (crt['CT'] == 0x25 and entry['RT'] != 0x05) or (crt['CT'] == 0x24 and entry['RT'] != 0x07):
+                    print("[WARNING] Mismatched CT/RT")
+                if crt['CT'] != 0x24 and crt['CT'] != 0x25:
+                    if crt['CD'] != entry['CD']:
+                        print(f"[WARNING] Mismatched CD for CID {entry['CID']:02X}")
+                    if crt['Response'] != entry['Response'][:-1]:
+                        print(f"[WARNING] Mismatched Response for CID {entry['CID']:02X}")
+                    break
 
 
 def parse_pfi(data, xgd):
@@ -79,39 +236,22 @@ def parse_ss(data, xgd, verbose):
         if data[0x104:0x108] != bytes([0x00, 0x00, 0x18, 0x80]):
             print(f"[WARNING] Unexpected Unknown2 Value: {int.from_bytes(data[0x104:0x108], 'big'):08X}")
     
-    if xgd > 1:
+    if xgd > 1 and verbose:
         print(f"SHA-1 (Unknown): {int.from_bytes(data[0x108:0x11B], 'big'):040X}")
-        
-        response_count = 0
-        for i, offset in enumerate(range(0x200, 0x2CF, 9), start=1):
-            hex_str = ''.join(f'{b:02X}' for b in data[offset:offset + 9])
-            if hex_str != "000000000000000000":
-                response_count = response_count + 1
-                if verbose:
-                    print(f"Challenge Response #{i:02}: 0x{hex_str}")
-        print(f"Challenge Responses: {response_count}")
     
     if xgd == 4:
-        cpr_mai = int.from_bytes(data[0x0F0:0x0F4], byteorder='big')
-        print(f"CPR_MAI Key: {cpr_mai:08X}")
+        cpr_mai = data[0x0F0:0x0F4]
     else:
-        cpr_mai = int.from_bytes(data[0x2D0:0x2D4], byteorder='big')
-        print(f"CPR_MAI Key: {cpr_mai:08X}")
+        cpr_mai = data[0x2D0:0x2D4]
+    print(f"CPR_MAI Key: {int.from_bytes(cpr_mai, byteorder='big'):08X}")
     
     if (xgd == 1 and data[0x300] != 1) or (xgd > 1 and data[0x300] != 2):
         print(f"Unexpected CCRT Version: 0x{data[0x300]:02X}")
     if (xgd == 1 and data[0x301] != 23) or (xgd > 1 and data[0x301] != 21):
         print(f"Unexpected CCRT Count: 0x{data[0x301]:02X}")
     
-    if xgd == 1:
-        enc_response_count = 0
-        for i, offset in enumerate(range(0x302, 0x3FF, 11), start=1):
-            hex_str = ''.join(f'{b:02X}' for b in data[offset:offset + 11])
-            if hex_str != "0000000000000000000000":
-                enc_response_count = enc_response_count + 1
-                if verbose:
-                    print(f"enCrypted Challenge Response #{i:02}: 0x{hex_str}")
-        print(f"enCrypted Challenge Responses: {enc_response_count}")
+    if xgd == 1:        
+        parse_ccrt(data, xgd, verbose)
         
         creation_time = filetime(data[0x41F:0x427])
         if creation_time == "":
@@ -125,15 +265,8 @@ def parse_ss(data, xgd, verbose):
         
         if verbose:
             print(f"Certificate Ver Hash: {int.from_bytes(data[0x43B:0x44B], 'big'):016X}")
-    elif xgd > 1:
-        enc_response_count = 0
-        for i, offset in enumerate(range(0x304, 0x400, 9), start=1):
-            hex_str = ''.join(f'{b:02X}' for b in data[offset:offset + 9])
-            if hex_str != "000000000000000000":
-                enc_response_count = enc_response_count + 1
-                if verbose:
-                    print(f"enCrypted Challenge Response #{i:02}: 0x{hex_str}")
-        print(f"enCrypted Challenge Responses: {enc_response_count}")
+    elif xgd > 1:        
+        parse_ccrt2(data, xgd, cpr_mai, verbose)
         
         media_id = data[0x460:0x470]
         media_id_str = ''.join(f"{b:02X}" for b in media_id)
