@@ -11,7 +11,7 @@ except ImportError:
     raise
 
 
-def parse_ccrt(data, xgd, verbose):
+def parse_ccrt(data, xgd, cpr_mai, verbose):
     if xgd == 1:
         enc_response_count = 0
         for i, offset in enumerate(range(0x302, 0x3FF, 11), start=1):
@@ -42,11 +42,37 @@ def parse_ccrt(data, xgd, verbose):
         S[x], S[y] = S[y], S[x]
         out.append(data[pos] ^ S[(S[x] + S[y]) % 256])
     
-    if verbose:
-        print("Valid Decrypted Challenge Responses:")
-        for i in range(0, len(out), 11):
-            if out[i] == 0x01:
+    valid_challenge_found = False
+    for i in range(0, len(out), 11):
+        print(f"{int.from_bytes(bytearray(out[i:i+11]), 'big'):022X}")
+        if out[i] == 0x01:
+            if not valid_challenge_found:
+                if verbose:
+                    print("Valid Decrypted Challenge Responses:")
+                challenge_value = out[i+2:i+2+4]
+                valid_challenge_found = True
+            else:
+                if bytes(challenge_value) != cpr_mai:
+                    print("[WARNING] Invalid Challenge Value")
+            if verbose:
                 print(f"Challenge ID: {out[i+1]:02X}, Value: {int.from_bytes(bytearray(out[i+2:i+2+4]), 'big'):04X}, Response Modifier: {out[i+6]:02X}, Response: {int.from_bytes(bytearray(out[i+7:i+7+4]), 'big'):04X}")
+        elif out[i] != 0x02 and out[i] != 0x03 and (out[i] & 0xF0) != 0xF0:
+            print("[WARNING] Unexpected Challenge ID")
+    if not valid_challenge_found:
+        print("[WARNING] No valid challenge entries")
+    
+    for i in range(0, 23*9, 9):
+        id_match = 0
+        for j in range(0, len(out), 11):
+            if data[0x661+i+1] == out[j+1]:
+                id_match = id_match + 1
+        if id_match == 0:
+            print("[WARNING] No matching response ID")
+        elif id_match > 1:
+            print("[WARNING] More than one matching response ID")
+        if i >= 16*9 and data[0x661+i] != 0x00 and (data[0x661+i] & 0xF0) != 0xF0:
+            print("[WARNING] Unexpected Challenge ID")
+        print(f"{int.from_bytes(data[0x661+i:0x661+i+3], 'big'):06X} {int.from_bytes(data[0x661+i+3:0x661+i+6], 'big'):06X} {int.from_bytes(data[0x661+i+6:0x661+i+9], 'big'):06X}")
 
 
 def parse_ccrt2(data, xgd, cpr_mai, verbose):
@@ -251,7 +277,7 @@ def parse_ss(data, xgd, verbose):
         print(f"Unexpected CCRT Count: 0x{data[0x301]:02X}")
     
     if xgd == 1:        
-        parse_ccrt(data, xgd, verbose)
+        parse_ccrt(data, xgd, cpr_mai, verbose)
         
         creation_time = filetime(data[0x41F:0x427])
         if creation_time == "":
