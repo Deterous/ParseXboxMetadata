@@ -44,7 +44,7 @@ def parse_ccrt(data, xgd, cpr_mai, verbose):
     
     valid_challenge_found = False
     for i in range(0, len(out), 11):
-        print(f"{int.from_bytes(bytearray(out[i:i+11]), 'big'):022X}")
+        #print(f"{int.from_bytes(bytearray(out[i:i+11]), 'big'):022X}")
         if out[i] == 0x01:
             if not valid_challenge_found:
                 if verbose:
@@ -72,7 +72,7 @@ def parse_ccrt(data, xgd, cpr_mai, verbose):
             print("[WARNING] More than one matching response ID")
         if i >= 16*9 and data[0x661+i] != 0x00 and (data[0x661+i] & 0xF0) != 0xF0:
             print("[WARNING] Unexpected Challenge ID")
-        print(f"{int.from_bytes(data[0x661+i:0x661+i+3], 'big'):06X} {int.from_bytes(data[0x661+i+3:0x661+i+6], 'big'):06X} {int.from_bytes(data[0x661+i+6:0x661+i+9], 'big'):06X}")
+        #print(f"{int.from_bytes(data[0x661+i:0x661+i+3], 'big'):06X} {int.from_bytes(data[0x661+i+3:0x661+i+6], 'big'):06X} {int.from_bytes(data[0x661+i+6:0x661+i+9], 'big'):06X}")
 
 
 def parse_ccrt2(data, xgd, cpr_mai, verbose):
@@ -285,12 +285,9 @@ def parse_ss(data, xgd, verbose):
         else:
             print(f"Creation Timestamp: {creation_time}")
         
-        if data[0x427:0x437] != b'\x00' * 16:
-            if verbose:
-                print(f"Certificate Hash: {int.from_bytes(data[0x427:0x437], 'big'):016X}")
-        
         if verbose:
-            print(f"Certificate Ver Hash: {int.from_bytes(data[0x43B:0x44B], 'big'):016X}")
+            print(f"Certificate GUID: {int.from_bytes(data[0x427:0x437], 'big'):016X}")
+            print(f"Authoring GUID: {int.from_bytes(data[0x43B:0x44B], 'big'):016X}")
     elif xgd > 1:        
         parse_ccrt2(data, xgd, cpr_mai, verbose)
         
@@ -316,7 +313,7 @@ def parse_ss(data, xgd, verbose):
             print(f"Certificate Timestamp: {cert_time}")
     
     if verbose:
-        print(f"Unknown Hash: {int.from_bytes(data[0x4BB:0x4CB], 'big'):016X}")
+        print(f"Unknown GUID: {int.from_bytes(data[0x4BB:0x4CB], 'big'):016X}")
         print(f"SS SHA-1 A: {int.from_bytes(data[0x4CB:0x4DF], 'big'):016X}")
         print(f"SS Signature A: {int.from_bytes(data[0x4CB:0x4DF], 'big'):016X}")
     
@@ -339,7 +336,7 @@ def parse_ss(data, xgd, verbose):
         print(f"[WARNING] Unexpected value at 0x5FA: {data[0x5FA]:02X}")
     
     if verbose:
-        print(f"Mastering SHA-1: {int.from_bytes(data[0x5FB:0x60B], 'big'):016X}")
+        print(f"Mastering GUID: {int.from_bytes(data[0x5FB:0x60B], 'big'):016X}")
         print(f"SS SHA-1 B: {int.from_bytes(data[0x60B:0x61F], 'big'):016X}")
         print(f"SS Signature B: {int.from_bytes(data[0x61F:0x65F], 'big'):016X}")
     
@@ -433,80 +430,153 @@ def main():
             else:
                 print(f"[WARNING] XGD{xgd} SS with non-zero data in SSv2 area")
         elif xgd == 3:
-            print("XGD3 with SSv1")
+            print("XGD3 with SSv1 (bad)")
         
-        clean_ss = bytearray(data)
+        clean_kreon_ss = bytearray(data)
         abgx_ss = bytearray(data)
-        if xgd == 2 or xgd == 3:
+        clean_0800_ss = bytearray(data)
+        if xgd == 2:
             for i in range(0x200, 0x300):
                 abgx_ss[i] = 0xFF
+            if abgx_ss == bytearray(data):
+                print("[WARNING] XGD2 SS matches abgx360 internal hash, bad angles")
         elif xgd == 4:
             for i in range(0x20, 0xF4):
                 abgx_ss[i] = 0xFF
+            if abgx_ss == bytearray(data):
+                print("[WARNING] XGD3 SS matches abgx360 internal hash, bad angles")
         
         if xgd == 2:
             if data[552] == 0x01 and data[553] == 0x00 and data[555] == 0x00 and data[556] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[564] == 0x00 and data[565] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[573] == 0x00 and data[574] == 0x00 and data[579] == 0x0F and data[580] == 0x01 and data[582] == 0x00 and data[583] == 0x00:
-                print("XGD2: Clean")
+                print("XGD2: Cleaned Kreon-style SS (Redump hash)")
+                clean_0800_ss[552] = 0x01
+                clean_0800_ss[553] = 0x00
+                clean_0800_ss[555] = 0x01
+                clean_0800_ss[556] = 0x00
+                clean_0800_ss[561] = 0x5B
+                clean_0800_ss[562] = 0x00
+                clean_0800_ss[564] = 0x5B
+                clean_0800_ss[565] = 0x00
+                clean_0800_ss[570] = 0xB5
+                clean_0800_ss[571] = 0x00
+                clean_0800_ss[573] = 0xB5
+                clean_0800_ss[574] = 0x00
+                clean_0800_ss[579] = 0x0F
+                clean_0800_ss[580] = 0x01
+                clean_0800_ss[582] = 0x0F
+                clean_0800_ss[583] = 0x01
+            elif data[552] == 0x01 and data[553] == 0x00 and data[555] == 0x01 and data[556] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[564] == 0x5B and data[565] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[573] == 0xB5 and data[574] == 0x00 and data[579] == 0x0F and data[580] == 0x01 and data[582] == 0x0F and data[583] == 0x01:
+                print("XGD2: Cleaned 0800-style SS")
+                clean_kreon_ss[552] = 0x01
+                clean_kreon_ss[553] = 0x00
+                clean_kreon_ss[555] = 0x00
+                clean_kreon_ss[556] = 0x00
+                clean_kreon_ss[561] = 0x5B
+                clean_kreon_ss[562] = 0x00
+                clean_kreon_ss[564] = 0x00
+                clean_kreon_ss[565] = 0x00
+                clean_kreon_ss[570] = 0xB5
+                clean_kreon_ss[571] = 0x00
+                clean_kreon_ss[573] = 0x00
+                clean_kreon_ss[574] = 0x00
+                clean_kreon_ss[579] = 0x0F
+                clean_kreon_ss[580] = 0x01
+                clean_kreon_ss[582] = 0x00
+                clean_kreon_ss[583] = 0x00
             else:
-                print("XGD2: Not Clean")
-                clean_ss[552] = 0x01
-                clean_ss[553] = 0x00
-                clean_ss[555] = 0x00
-                clean_ss[556] = 0x00
-                clean_ss[561] = 0x5B
-                clean_ss[562] = 0x00
-                clean_ss[564] = 0x00
-                clean_ss[565] = 0x00
-                clean_ss[570] = 0xB5
-                clean_ss[571] = 0x00
-                clean_ss[573] = 0x00
-                clean_ss[574] = 0x00
-                clean_ss[579] = 0x0F
-                clean_ss[580] = 0x01
-                clean_ss[582] = 0x00
-                clean_ss[583] = 0x00
+                print("XGD2: Raw SS")
+                clean_kreon_ss[552] = 0x01
+                clean_kreon_ss[553] = 0x00
+                clean_kreon_ss[555] = 0x00
+                clean_kreon_ss[556] = 0x00
+                clean_kreon_ss[561] = 0x5B
+                clean_kreon_ss[562] = 0x00
+                clean_kreon_ss[564] = 0x00
+                clean_kreon_ss[565] = 0x00
+                clean_kreon_ss[570] = 0xB5
+                clean_kreon_ss[571] = 0x00
+                clean_kreon_ss[573] = 0x00
+                clean_kreon_ss[574] = 0x00
+                clean_kreon_ss[579] = 0x0F
+                clean_kreon_ss[580] = 0x01
+                clean_kreon_ss[582] = 0x00
+                clean_kreon_ss[583] = 0x00
+                clean_0800_ss[552] = 0x01
+                clean_0800_ss[553] = 0x00
+                clean_0800_ss[555] = 0x01
+                clean_0800_ss[556] = 0x00
+                clean_0800_ss[561] = 0x5B
+                clean_0800_ss[562] = 0x00
+                clean_0800_ss[564] = 0x5B
+                clean_0800_ss[565] = 0x00
+                clean_0800_ss[570] = 0xB5
+                clean_0800_ss[571] = 0x00
+                clean_0800_ss[573] = 0xB5
+                clean_0800_ss[574] = 0x00
+                clean_0800_ss[579] = 0x0F
+                clean_0800_ss[580] = 0x01
+                clean_0800_ss[582] = 0x0F
+                clean_0800_ss[583] = 0x01
         elif xgd == 3:
             if data[552] == 0x01 and data[553] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[579] == 0x0F and data[580] == 0x00:
-                print("XGD3 SSv1: Clean")
+                print("XGD3 SSv1: Cleaned Kreon-style (Redump hash)")
+                clean_kreon_ss[552] = 0x01
+                clean_kreon_ss[553] = 0x00
+                clean_kreon_ss[561] = 0x5B
+                clean_kreon_ss[562] = 0x00
+                clean_kreon_ss[570] = 0xB5
+                clean_kreon_ss[571] = 0x00
+                clean_kreon_ss[579] = 0x0F
+                clean_kreon_ss[580] = 0x00
             else:
-                print("XGD3 SSv1: Not Clean")
-                clean_ss[552] = 0x01
-                clean_ss[553] = 0x00
-                clean_ss[561] = 0x5B
-                clean_ss[562] = 0x00
-                clean_ss[570] = 0xB5
-                clean_ss[571] = 0x00
-                clean_ss[579] = 0x0F
-                clean_ss[580] = 0x00
+                print("XGD3 SSv1: Raw SS")
+                clean_kreon_ss[552] = 0x01
+                clean_kreon_ss[553] = 0x00
+                clean_kreon_ss[561] = 0x5B
+                clean_kreon_ss[562] = 0x00
+                clean_kreon_ss[570] = 0xB5
+                clean_kreon_ss[571] = 0x00
+                clean_kreon_ss[579] = 0x0F
+                clean_kreon_ss[580] = 0x00
         elif xgd == 4:
             if data[72] == 0x01 and data[73] == 0x00 and data[75] == 0x01 and data[76] == 0x00 and data[81] == 0x5B and data[82] == 0x00 and data[84] == 0x5B and data[85] == 0x00 and data[90] == 0xB5 and data[91] == 0x00 and data[93] == 0xB5 and data[94] == 0x00 and data[99] == 0x0F and data[100] == 0x01 and data[102] == 0x0F and data[103] == 0x01:
-                print("XGD3 SSv2: Clean")
+                print("XGD3 SSv2: Cleaned SS (Redump hash)")
             else:
-                print("XGD3 SSv2: Not Clean")
-                clean_ss[72] = 0x01
-                clean_ss[73] = 0x00
-                clean_ss[75] = 0x01
-                clean_ss[76] = 0x00
-                clean_ss[81] = 0x5B
-                clean_ss[82] = 0x00
-                clean_ss[84] = 0x5B
-                clean_ss[85] = 0x00
-                clean_ss[90] = 0xB5
-                clean_ss[91] = 0x00
-                clean_ss[93] = 0xB5
-                clean_ss[94] = 0x00
-                clean_ss[99] = 0x0F
-                clean_ss[100] = 0x01
-                clean_ss[102] = 0x0F
-                clean_ss[103] = 0x01
+                print("XGD3 SSv2: Raw SS")
+                clean_kreon_ss[72] = 0x01
+                clean_kreon_ss[73] = 0x00
+                clean_kreon_ss[75] = 0x01
+                clean_kreon_ss[76] = 0x00
+                clean_kreon_ss[81] = 0x5B
+                clean_kreon_ss[82] = 0x00
+                clean_kreon_ss[84] = 0x5B
+                clean_kreon_ss[85] = 0x00
+                clean_kreon_ss[90] = 0xB5
+                clean_kreon_ss[91] = 0x00
+                clean_kreon_ss[93] = 0xB5
+                clean_kreon_ss[94] = 0x00
+                clean_kreon_ss[99] = 0x0F
+                clean_kreon_ss[100] = 0x01
+                clean_kreon_ss[102] = 0x0F
+                clean_kreon_ss[103] = 0x01
         
         ss_crc = zlib.crc32(data)
-        print(f"SS Hash: {ss_crc:8X}")
-        if xgd > 1:
-            clean_ss_crc = zlib.crc32(clean_ss)
-            print(f"Cleaned SS Hash: {clean_ss_crc:8X}")
+        print(f"SS Hash: {ss_crc:08X}")
+        if xgd == 2:
+            clean_kreon_ss_crc = zlib.crc32(clean_kreon_ss)
+            print(f"Redump SS Hash: {clean_kreon_ss_crc:08X}")
+            clean_0800_ss_crc = zlib.crc32(clean_0800_ss)
+            print(f"Fixed angles SS Hash: {clean_0800_ss_crc:08X}")
             abgx_ss_crc = zlib.crc32(abgx_ss)
-            print(f"abgx360 SS Hash: {abgx_ss_crc:8X}")
+            print(f"abgx360 filename: SS_{abgx_ss_crc:08X}.bin")
+        if xgd == 3:
+            clean_kreon_ss_crc = zlib.crc32(clean_kreon_ss)
+            print(f"Redump SS Hash: {clean_kreon_ss_crc:08X}")
+        if xgd == 4:
+            clean_kreon_ss_crc = zlib.crc32(clean_kreon_ss)
+            print(f"Redump SS Hash: {clean_kreon_ss_crc:08X}")
+            abgx_ss_crc = zlib.crc32(abgx_ss)
+            print(f"abgx360 filename: SS_{abgx_ss_crc:08X}.bin")
         
         parse_pfi(data, xgd)
         
