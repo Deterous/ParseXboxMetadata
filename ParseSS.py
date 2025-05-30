@@ -1,4 +1,5 @@
 import sys
+import os
 import datetime
 import hashlib
 import zlib
@@ -78,23 +79,33 @@ def parse_ccrt(data, xgd, cpr_mai, verbose):
 def parse_ccrt2(data, xgd, cpr_mai, verbose):
     if xgd == 1:
         return
-    elif xgd == 2:
-        offset = 0x200
-    elif xgd >= 3:
+    elif xgd == 4:
         offset = 0x20
+    else:
+        offset = 0x200
+    
+    if data[555] == 0x00 and data[556] == 0x00 and data[564] == 0x00 and data[565] == 0x00 and data[573] == 0x00 and data[574] == 0x00 and data[582] == 0x00 and data[583] == 0x00:
+        is_kreon_ss = True
+    elif xgd == 3:
+        is_kreon_ss = True
+    else:
+        is_kreon_ss = False
     
     key = bytes([0xD1, 0xE3, 0xB3, 0x3A, 0x6C, 0x1E, 0xF7, 0x70, 0x5F, 0x6D, 0xE9, 0x3B, 0xB6, 0xC0, 0xDC, 0x71])
     iv = bytearray(16)
     dcrt = bytearray(252)
     cipher = Cipher(algorithms.AES(key), modes.ECB()).decryptor()
-    for i in range(15):
+    for i in range(16):
         ct = bytes(data[0x304+i*16:0x304+(i+1)*16])
-        pt = bytearray(cipher.update(ct))
-        for j in range(16):
-            pt[j] ^= iv[j]
-        iv[:] = ct
-        dcrt[i*16 : (i+1)*16] = pt
-        
+        if i == 15:
+            dcrt[i*16 : (i+1)*16] = ct
+        else:
+            pt = bytearray(cipher.update(ct))
+            for j in range(16):
+                pt[j] ^= iv[j]
+            iv[:] = ct
+            dcrt[i*16 : (i+1)*16] = pt
+    
     enc_response_count = 0
     for i in range(0x304, 0x400, 12):
         hex_str = ''.join(f'{b:02X}' for b in data[i:i+12])
@@ -131,21 +142,22 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
             elif CT01_firstCD != entry["CD"]:
                 print("[WARNING] CT01 conflict")
         
-        if entry['angle'] == 0 or entry['angle'] > 360:
-            entry['angle'] = ''
+        if entry["CT"] != 24 and entry["CT"] != 25:
+            angle = ''
         else:
-            entry['angle'] = f"{entry['angle']}°"
+            angle = f"{entry['angle']}°"
+        
         if verbose:
             print(f"{entry['CT']:02X}  {entry['CID']:02X}  {entry['Tolerance']:02X}   {entry['Type']:02X}   "
               f"{entry['CD'][0]:02X}{entry['CD'][1]:02X}{entry['CD'][2]:02X}{entry['CD'][3]:02X}   "
               f"{entry['Response'][0]:02X}{entry['Response'][1]:02X}{entry['Response'][2]:02X}{entry['Response'][3]:02X}   "
-              f"{entry['angle']:<7}")
+              f"{angle:<7}")
     if not CT01_conflict and CT01_firstCD != cpr_mai:
         print(f"[WARNING] CPR_MAI mismatch, CCRT contains: {int.from_bytes(CT01_firstCD, 'big'):04X}")
     
     response_count = 0
-    for i in range(offset, offset + 0xCF, 9):
-        hex_str = ''.join(f'{b:02X}' for b in data[i:i+9])
+    for i in range(23):
+        hex_str = ''.join(f'{b:02X}' for b in data[0x730+i*9:0x730+i*9+9])
         if hex_str != "000000000000000000":
             response_count = response_count + 1
     
@@ -155,6 +167,8 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
     
     rtentry = []
     for i in range(response_count):
+        if (data[0x730+i*9] & 0xF0) == 0xF0:
+            continue
         entry = {
             "RT": data[0x730+i*9],  # Response Type
             "CID": data[0x730+i*9+1],  # Challenge ID
@@ -162,7 +176,7 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
             "Data": data[0x730+i*9+3:0x730+i*9+9],  # incl SS ranges
             "CD": data[offset+i*9:offset+i*9+4],
             "Response": data[offset+i*9+4:offset+i*9+9],
-            "angle": (data[offset+i*9+5] << 8) | data[offset+i*9+5],
+            "angle": (data[offset+i*9+5] << 8) | data[offset+i*9+4],
             "angle2": (data[offset+i*9+8] << 8) | data[offset+i*9+7],
         }
         rtentry.append(entry)
@@ -175,13 +189,41 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
     
     for entry in rtentry:
         for crt in dcrtentry:
+            if crt['CT'] != 0x01 and crt['CT'] != 0xE0 and crt['CT'] != 0x14 and crt['CT'] != 0x15 and crt['CT'] != 0x24 and crt['CT'] != 0x25 and (crt['CT'] & 0xF0) != 0xF0:
+                print(f"[WARNING] Unexpected CT {crt['CT']:02X}")
             if crt['CID'] == entry['CID']:
                 if (crt['CT'] == 0x15 and entry['RT'] != 0x01) or (crt['CT'] == 0x14 and entry['RT'] != 0x03) or (crt['CT'] == 0x25 and entry['RT'] != 0x05) or (crt['CT'] == 0x24 and entry['RT'] != 0x07):
                     print("[WARNING] Mismatched CT/RT")
-                if crt['CT'] != 0x24 and crt['CT'] != 0x25:
-                    if crt['CD'] != entry['CD']:
+                if crt['CT'] != 0xE0 and crt['CT'] != 0x01:
+                    if crt['CT'] == 0x24 or crt['CT'] == 0x25:
+                        # Deal with angle measurements differently
+                        zeroed_angles = False
+                        if crt['CD'] != entry['CD']:
+                            print(f"[WARNING] Mismatched CD for CID {entry['CID']:02X}")
+                            if entry['CD'] == b'\x00\x00\x00\x00':
+                                zeroed_angles = True
+                        if crt['angle'] > 359:
+                            print(f"[WARNING] Invalid angle (>359deg) in challenge")
+                        if xgd != 3 and (entry['angle'] > 359 or entry['angle2'] > 359):
+                            print(f"[WARNING] Invalid angle (>359deg) in response")
+                        angle_diff = abs((entry['angle'] - crt['angle'] + 180) % 360 - 180)
+                        if not zeroed_angles and angle_diff > 9:
+                            print(f"[WARNING] Angle {entry['angle']} varies significantly from expected {crt['angle']}")
+                        angle2_diff = abs((entry['angle2'] - crt['angle'] + 180) % 360 - 180)
+                        if not zeroed_angles and xgd != 3 and (xgd != 2 or not is_kreon_ss) and angle2_diff > 9:
+                            print(f"[WARNING] Angle2 {entry['angle2']} varies significantly from expected {crt['angle']}")
+                        if entry['angle'] == 359:
+                            print(f"[WARNING] First angle is 359deg, incompatible with iXtreme 1.4")
+                        if entry['angle'] != entry['angle2'] and entry['angle'] == 0 and entry['angle2'] == 359:
+                            print(f"[WARNING] SS has been fixed by abgx for iXtreme 1.4 compatibility reasons")
+                        elif xgd != 3 and entry['angle'] != entry['angle2'] and not is_kreon_ss:
+                            print(f"[WARNING] Mismatched angles in response: {entry['angle']} vs {entry['angle2']}")
+                        break
+                    elif crt['CD'] != entry['CD'] and crt['Response'] != entry['Response'][:-1]:
+                        print(f"[WARNING] Mismatched CD and Response for CID {entry['CID']:02X}")
+                    elif crt['CD'] != entry['CD']:
                         print(f"[WARNING] Mismatched CD for CID {entry['CID']:02X}")
-                    if crt['Response'] != entry['Response'][:-1]:
+                    elif crt['Response'] != entry['Response'][:-1]:
                         print(f"[WARNING] Mismatched Response for CID {entry['CID']:02X}")
                     break
 
@@ -366,21 +408,8 @@ def parse_ss(data, xgd, verbose):
         print("[WARNING] Duplicated SS range does not match")
 
 
-def main():
-    if len(sys.argv) != 2 and len(sys.argv) != 3:
-        print("Usage: python ParseSS.py <filename> [-v, --verbose]")
-        return
-    
-    verbose = False
-    filename = sys.argv[1]
-    if len(sys.argv) == 3:
-        if filename == "-v" or filename =="--verbose":
-            verbose = True
-            filename = sys.argv[2]
-        elif sys.argv[2] == "-v" or sys.argv[2] == "--verbose":
-            verbose = True
-    
-    with open(filename, 'rb') as f:
+def parse_file(file_path, verbose):
+    with open(file_path, 'rb') as f:
         data = f.read(2048)
         if len(data) < 2048:
             print("[ERROR] Not a valid SS: <2048 bytes")
@@ -446,7 +475,7 @@ def main():
             if abgx_ss == bytearray(data):
                 print("[WARNING] XGD3 SS matches abgx360 internal hash, bad angles")
         
-        if xgd == 2:
+        if xgd == 2:            
             if data[552] == 0x01 and data[553] == 0x00 and data[555] == 0x00 and data[556] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[564] == 0x00 and data[565] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[573] == 0x00 and data[574] == 0x00 and data[579] == 0x0F and data[580] == 0x01 and data[582] == 0x00 and data[583] == 0x00:
                 print("XGD2: Cleaned Kreon-style SS (Redump hash)")
                 clean_0800_ss[552] = 0x01
@@ -602,10 +631,54 @@ def main():
             print(f"[ERROR] Not a valid Xbox SS: Byte at 0x4BA is 0x{data[0]:02X}")
             return
 
+
 if __name__ == "__main__":
     try:
-        main()
-    except FileNotFoundError:
-        print(f"[ERROR] File file not found.")
+        if len(sys.argv) < 2 or len(sys.argv) > 5:
+            print("Usage: python ParseSS.py <filename|directory> [-v,--verbose] [-r,--recursive] [-s,--ss-only]")
+            print()
+            print("Options:")
+            print("input: file path to parse, or directory of files to parse")
+            print("-v, --verbose\t Prints extra information about SS")
+            print("-r, --recursive\t Parses all files in dir recursively")
+            print("-s, --ss-only\t Only parses .bin files in dir that start with SS")
+            sys.exit(0)
+        
+        input_path = None
+        verbose = False
+        recursive = False
+        ss_only = False
+        for arg in sys.argv[1:]:
+            if arg in ("-v", "--verbose"):
+                verbose = True
+            elif arg in ("-r", "--recursive"):
+                recursive = True
+            elif arg in ("-s", "--ss-only"):
+                ss_only = True
+            else:
+                input_path = arg
+        
+        if not input_path:
+            print("[ERROR] No valid filename provided")
+            sys.exit(0)
+        
+        if os.path.isdir(input_path):
+            if recursive:
+                for root, _, files in os.walk(input_path):
+                    for file in files:
+                        if not ss_only or (file.startswith("SS") and file.endswith(".bin")):
+                            file_path = os.path.join(root, file)
+                            print(file_path)
+                            parse_file(file_path, verbose)
+            else:
+                for entry in os.listdir(input_path):
+                    file_path = os.path.join(input_path, entry)
+                    if os.path.isfile(file_path) and (not ss_only or (os.path.basename(file_path).startswith("SS") and file_path.endswith(".bin"))):
+                        print(file_path)
+                        parse_file(file_path, verbose)
+        elif os.path.isfile(input_path):
+            parse_file(input_path, verbose)
+        else:
+            print(f"[ERROR] Invalid path: {input_path}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"[ERROR] {e}")

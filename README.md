@@ -51,7 +51,7 @@ PFI CRC: 26AF4C58
 
 # ParseSS
 
-`python ParseSS.py <filename> [-v, --verbose]`
+`python ParseSS.py <filename|directory> [-v,--verbose] [-r,--recursive] [-s,--ss-only]`
 
 Parse Xbox and Xbox360 SS sector for its useful metadata, e.g.
 
