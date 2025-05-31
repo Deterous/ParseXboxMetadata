@@ -438,13 +438,13 @@ def parse_file(file_path, verbose):
                 print(f"[WARNING] XGD{xgd} but value at 0x4BA is: {data[0x4BA]}")
         else:
             print(f"[WARNING] Unexpected value at 0x4BA: {data[0x4BA]}")
-        
+
         if xgd == 1:
             print("System: Xbox (XGD1)")
         elif xgd == 2:
             print("System: Xbox 360 (XGD2)")
         elif xgd == 2.5:
-            print("System: Xbox 360 (XGD2 ?)")
+            print("[WARNING] System: Xbox 360 (Malformed XGD2)")
             xgd = 2
         elif xgd == 3:
             print("System: Xbox 360 (XGD3)")
@@ -455,11 +455,10 @@ def parse_file(file_path, verbose):
         if data[32:104] != b'\x00' * 72:
             if xgd == 3:
                 xgd = 4
-                print("XGD3 with SSv2")
             else:
-                print(f"[WARNING] XGD{xgd} SS with non-zero data in SSv2 area")
+                print(f"[WARNING] XGD{xgd} SS with non-zero data in XGD3 SS table")
         elif xgd == 3:
-            print("XGD3 with SSv1 (bad)")
+            print("[WARNING] XGD3 with empty SS table")
         
         clean_kreon_ss = bytearray(data)
         abgx_ss = bytearray(data)
@@ -495,7 +494,7 @@ def parse_file(file_path, verbose):
                 clean_0800_ss[582] = 0x0F
                 clean_0800_ss[583] = 0x01
             elif data[552] == 0x01 and data[553] == 0x00 and data[555] == 0x01 and data[556] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[564] == 0x5B and data[565] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[573] == 0xB5 and data[574] == 0x00 and data[579] == 0x0F and data[580] == 0x01 and data[582] == 0x0F and data[583] == 0x01:
-                print("XGD2: Cleaned 0800-style SS")
+                print("XGD2: Cleaned 0800-style SS (Fixed angles)")
                 clean_kreon_ss[552] = 0x01
                 clean_kreon_ss[553] = 0x00
                 clean_kreon_ss[555] = 0x00
@@ -513,7 +512,15 @@ def parse_file(file_path, verbose):
                 clean_kreon_ss[582] = 0x00
                 clean_kreon_ss[583] = 0x00
             else:
-                print("XGD2: Raw SS")
+                if_kreon_ss = False
+                if data[555] == 0x00 and data[556] == 0x00 and data[564] == 0x00 and data[565] == 0x00 and data[573] == 0x00 and data[574] == 0x00 and data[582] == 0x00 and data[583] == 0x00:
+                    is_kreon_ss = True
+                if is_kreon_ss and data[552] == 0x00 and data[553] == 0x00 and data[561] == 0x00 and data[562] == 0x00 and data[570] == 0x00 and data[571] == 0x00 and data[579] == 0x00 and data[580] == 0x00:
+                    is_kreon_ss = False
+                if is_kreon_ss:
+                    print("XGD2: Raw 0800-style SS (Raw SSv2)")
+                else:
+                    print("XGD2: Raw Kreon-style SS (Raw SSv1)")
                 clean_kreon_ss[552] = 0x01
                 clean_kreon_ss[553] = 0x00
                 clean_kreon_ss[555] = 0x00
@@ -548,7 +555,7 @@ def parse_file(file_path, verbose):
                 clean_0800_ss[583] = 0x01
         elif xgd == 3:
             if data[552] == 0x01 and data[553] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[579] == 0x0F and data[580] == 0x00:
-                print("XGD3 SSv1: Cleaned Kreon-style (Redump hash)")
+                print("[WARNING] XGD3: Cleaned Kreon-style invalid SS (Bad Redump hash)")
                 clean_kreon_ss[552] = 0x01
                 clean_kreon_ss[553] = 0x00
                 clean_kreon_ss[561] = 0x5B
@@ -558,7 +565,7 @@ def parse_file(file_path, verbose):
                 clean_kreon_ss[579] = 0x0F
                 clean_kreon_ss[580] = 0x00
             else:
-                print("XGD3 SSv1: Raw SS")
+                print("[WARNING] XGD3: Raw Kreon-style invalid SS")
                 clean_kreon_ss[552] = 0x01
                 clean_kreon_ss[553] = 0x00
                 clean_kreon_ss[561] = 0x5B
@@ -569,9 +576,17 @@ def parse_file(file_path, verbose):
                 clean_kreon_ss[580] = 0x00
         elif xgd == 4:
             if data[72] == 0x01 and data[73] == 0x00 and data[75] == 0x01 and data[76] == 0x00 and data[81] == 0x5B and data[82] == 0x00 and data[84] == 0x5B and data[85] == 0x00 and data[90] == 0xB5 and data[91] == 0x00 and data[93] == 0xB5 and data[94] == 0x00 and data[99] == 0x0F and data[100] == 0x01 and data[102] == 0x0F and data[103] == 0x01:
-                print("XGD3 SSv2: Cleaned SS (Redump hash)")
+                print("XGD3: Cleaned SSv2 (Redump hash)")
             else:
-                print("XGD3 SSv2: Raw SS")
+                if_kreon_ss = False
+                if data[75] == 0x00 and data[76] == 0x00 and data[84] == 0x00 and data[85] == 0x00 and data[93] == 0x00 and data[94] == 0x00 and data[102] == 0x00 and data[103] == 0x00:
+                    is_kreon_ss = True
+                if is_kreon_ss and data[72] == 0x00 and data[73] == 0x00 and data[81] == 0x00 and data[82] == 0x00 and data[90] == 0x00 and data[91] == 0x00 and data[99] == 0x00 and data[100] == 0x00:
+                    is_kreon_ss = False
+                if is_kreon_ss:
+                    print("XGD3: Raw 0800-style SS (SSv2)")
+                else:
+                    print("XGD3: Raw Kreon-style SS (SSv1)")
                 clean_kreon_ss[72] = 0x01
                 clean_kreon_ss[73] = 0x00
                 clean_kreon_ss[75] = 0x01

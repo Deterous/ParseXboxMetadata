@@ -86,35 +86,35 @@ SS LBA Range #16: 3534182-3538277
 ```
 ```
 System: Xbox 360 (XGD2)
-XGD2: Raw SS
-SS Hash: DDEA754A
-Redump SS Hash: EAFB630F
-Fixed angles SS Hash: E993DA80
-abgx360 filename: SS_92B2694A.bin
-LBA Data Start: 129824
-LBA Layerbreak: 1913759
-LBA Data Final: 3697695
-CPR_MAI Key: 0949B873
-Media ID: 9D3070753DEB6B5E68B44018-2BC527C6
-Authoring Timestamp: 2009-09-28 00:00:00000000
-Mastering Timestamp: 2009-10-06 02:36:07250000
-SS LBA Range #01: 108976-113071
-SS LBA Range #04: 3719856-3723951
-```
-```
-System: Xbox 360 (XGD2)
 XGD2: Cleaned Kreon-style SS (Redump hash)
-SS Hash: A1920A65
-Redump SS Hash: A1920A65
-Fixed angles SS Hash: A2FAB3EA
-abgx360 filename: SS_1204560D.bin
+SS Hash: 3522A865
+Redump SS Hash: 3522A865
+Fixed angles SS Hash: 364A11EA
+abgx360 filename: SS_A15016B3.bin
 LBA Data Start: 129824
 LBA Layerbreak: 1913759
 LBA Data Final: 3697695
-CPR_MAI Key: EFF954F7
-Media ID: 0D50D93F4FF1B1D7EF914710-331A081B
-Authoring Timestamp: 2008-06-03 00:00:00000000
-Mastering Timestamp: 2008-06-22 02:49:57406250
+CPR_MAI Key: 4D567B55
+Media ID: D2D2FEE254B8C0A173CA9FA4-44C47D22
+Authoring Timestamp: 2008-09-29 00:00:00000000
+Mastering Timestamp: 2008-10-04 06:52:34781250
 SS LBA Range #01: 108976-113071
 SS LBA Range #04: 3719856-3723951
+```
+```
+System: Xbox 360 (XGD3)
+XGD3: Cleaned SSv2 (Redump hash)
+SS Hash: 4D6D63CA
+Redump SS Hash: 4D6D63CA
+abgx360 filename: SS_68938F7A.bin
+LBA Data Start: 16640
+LBA Layerbreak: 2133519
+LBA Data Final: 4246303
+Unknown1 Value: 003BEBB0
+CPR_MAI Key: 2A665A58
+Media ID: 70239869090D1AD8C8F566B6-39376ED6
+Authoring Timestamp: 2015-08-30 00:00:00000000
+Mastering Timestamp: 2015-09-08 12:40:25437740
+SS LBA Range #01: 12544-16639
+SS LBA Range #04: 4246304-4250399
 ```
