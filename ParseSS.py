@@ -650,7 +650,7 @@ def parse_file(file_path, verbose):
 if __name__ == "__main__":
     try:
         if len(sys.argv) < 2 or len(sys.argv) > 5:
-            print("Usage: python ParseSS.py <filename|directory> [-v,--verbose] [-r,--recursive] [-s,--ss-only]")
+            print("Usage: python ParseSS.py <filename|directory> [-v|--verbose] [-r|--recursive] [-s|--ss-only]")
             print()
             print("Options:")
             print("input: file path to parse, or directory of files to parse")

@@ -52,7 +52,7 @@ def print_trailer(data, verbose):
 
 def main():
     if len(sys.argv) != 2 and len(sys.argv) != 3:
-        print("Usage: python ParseDMI.py <filename> [-v, --verbose]")
+        print("Usage: python ParseDMI.py <filename> [-v|--verbose]")
         return
     
     verbose = False

@@ -118,3 +118,7 @@ Mastering Timestamp: 2015-09-08 12:40:25437740
 SS LBA Range #01: 12544-16639
 SS LBA Range #04: 4246304-4250399
 ```
+
+# CleanSS
+
+A python reimplementation of [ss_sector_range](http://redump.org/download/ss_sector_range_1.0e.rar) that will edit an SS file such that its CRC32 hash matches the hash that redump tracks for SS files. Specifically, it sets the "angle" values in the reponse table to be fixed values such that SS files that are identical except for their angle values, will "clean" to the same file, the "Redump hash" that is printed by ParseSS.py
