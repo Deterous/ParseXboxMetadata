@@ -213,9 +213,9 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
                         if not zeroed_angles and xgd != 3 and (xgd != 2 or not is_kreon_ss) and angle2_diff > 9:
                             print(f"[WARNING] Angle2 {entry['angle2']} varies significantly from expected {crt['angle']}")
                         if entry['angle'] == 359:
-                            print(f"[WARNING] First angle is 359deg, incompatible with iXtreme 1.4")
+                            print(f"[INFO] First angle is 359deg, incompatible with iXtreme 1.4")
                         if entry['angle'] != entry['angle2'] and entry['angle'] == 0 and entry['angle2'] == 359:
-                            print(f"[WARNING] SS has been fixed by abgx for iXtreme 1.4 compatibility reasons")
+                            print(f"[INFO] SS has been fixed by abgx for iXtreme 1.4 compatibility reasons")
                         elif xgd != 3 and entry['angle'] != entry['angle2'] and not is_kreon_ss:
                             print(f"[WARNING] Mismatched angles in response: {entry['angle']} vs {entry['angle2']}")
                         break
