@@ -518,9 +518,9 @@ def parse_file(file_path, verbose):
                 if is_kreon_ss and data[552] == 0x00 and data[553] == 0x00 and data[561] == 0x00 and data[562] == 0x00 and data[570] == 0x00 and data[571] == 0x00 and data[579] == 0x00 and data[580] == 0x00:
                     is_kreon_ss = False
                 if is_kreon_ss:
-                    print("XGD2: Raw 0800-style SS (Raw SSv2)")
-                else:
                     print("XGD2: Raw Kreon-style SS (Raw SSv1)")
+                else:
+                    print("XGD2: Raw 0800-style SS (Raw SSv2)")
                 clean_kreon_ss[552] = 0x01
                 clean_kreon_ss[553] = 0x00
                 clean_kreon_ss[555] = 0x00
@@ -584,9 +584,9 @@ def parse_file(file_path, verbose):
                 if is_kreon_ss and data[72] == 0x00 and data[73] == 0x00 and data[81] == 0x00 and data[82] == 0x00 and data[90] == 0x00 and data[91] == 0x00 and data[99] == 0x00 and data[100] == 0x00:
                     is_kreon_ss = False
                 if is_kreon_ss:
-                    print("XGD3: Raw 0800-style SS (SSv2)")
-                else:
                     print("XGD3: Raw Kreon-style SS (SSv1)")
+                else:
+                    print("XGD3: Raw 0800-style SS (SSv2)")
                 clean_kreon_ss[72] = 0x01
                 clean_kreon_ss[73] = 0x00
                 clean_kreon_ss[75] = 0x01
