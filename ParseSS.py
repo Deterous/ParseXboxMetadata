@@ -187,10 +187,11 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
               f"{entry['CD'][0]:02X}{entry['CD'][1]:02X}{entry['CD'][2]:02X}{entry['CD'][3]:02X}   "
               f"{entry['Response'][0]:02X}{entry['Response'][1]:02X}{entry['Response'][2]:02X}{entry['Response'][3]:02X}{entry['Response'][4]:02X}   ")
     
+    for crt in dcrtentry:
+        if crt['CT'] != 0x01 and crt['CT'] != 0xE0 and crt['CT'] != 0x14 and crt['CT'] != 0x15 and crt['CT'] != 0x24 and crt['CT'] != 0x25 and (crt['CT'] & 0xF0) != 0xF0:
+            print(f"[WARNING] Unexpected CT {crt['CT']:02X}")
     for entry in rtentry:
         for crt in dcrtentry:
-            if crt['CT'] != 0x01 and crt['CT'] != 0xE0 and crt['CT'] != 0x14 and crt['CT'] != 0x15 and crt['CT'] != 0x24 and crt['CT'] != 0x25 and (crt['CT'] & 0xF0) != 0xF0:
-                print(f"[WARNING] Unexpected CT {crt['CT']:02X}")
             if crt['CID'] == entry['CID']:
                 if (crt['CT'] == 0x15 and entry['RT'] != 0x01) or (crt['CT'] == 0x14 and entry['RT'] != 0x03) or (crt['CT'] == 0x25 and entry['RT'] != 0x05) or (crt['CT'] == 0x24 and entry['RT'] != 0x07):
                     print("[WARNING] Mismatched CT/RT")
