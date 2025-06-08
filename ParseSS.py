@@ -464,6 +464,7 @@ def parse_file(file_path, verbose):
         clean_kreon_ss = bytearray(data)
         abgx_ss = bytearray(data)
         clean_0800_ss = bytearray(data)
+        xgd1_fixed_ss = bytearray(data)
         if xgd == 2:
             for i in range(0x200, 0x300):
                 abgx_ss[i] = 0xFF
@@ -475,7 +476,11 @@ def parse_file(file_path, verbose):
             if abgx_ss == bytearray(data):
                 print("[WARNING] XGD3 SS matches abgx360 internal hash, bad angles")
         
-        if xgd == 2:            
+        if xgd == 1:
+            xgd1_fixed_ss[0x200:0x2CF] = b'\x00' * (0x65F - 0x5FA)
+            xgd1_fixed_ss[0x5DF:0x5E7] = b'\x00' * (0x5E7 - 0x5DF)
+            xgd1_fixed_ss[0x5FA:0x65F] = b'\x00' * (0x65F - 0x5FA)
+        elif xgd == 2:            
             if data[552] == 0x01 and data[553] == 0x00 and data[555] == 0x00 and data[556] == 0x00 and data[561] == 0x5B and data[562] == 0x00 and data[564] == 0x00 and data[565] == 0x00 and data[570] == 0xB5 and data[571] == 0x00 and data[573] == 0x00 and data[574] == 0x00 and data[579] == 0x0F and data[580] == 0x01 and data[582] == 0x00 and data[583] == 0x00:
                 print("XGD2: Cleaned Kreon-style SS (Redump hash)")
                 clean_0800_ss[552] = 0x01
@@ -607,17 +612,20 @@ def parse_file(file_path, verbose):
         
         ss_crc = zlib.crc32(data)
         print(f"SS Hash: {ss_crc:08X}")
-        if xgd == 2:
+        if xgd == 1:
+            xgd1_fixed_ss_crc = zlib.crc32(xgd1_fixed_ss)
+            print(f"Internal SS Hash: {xgd1_fixed_ss_crc:08X}")
+        elif xgd == 2:
             clean_kreon_ss_crc = zlib.crc32(clean_kreon_ss)
             print(f"Redump SS Hash: {clean_kreon_ss_crc:08X}")
             clean_0800_ss_crc = zlib.crc32(clean_0800_ss)
             print(f"Fixed angles SS Hash: {clean_0800_ss_crc:08X}")
             abgx_ss_crc = zlib.crc32(abgx_ss)
             print(f"abgx360 filename: SS_{abgx_ss_crc:08X}.bin")
-        if xgd == 3:
+        elif xgd == 3:
             clean_kreon_ss_crc = zlib.crc32(clean_kreon_ss)
             print(f"Redump SS Hash: {clean_kreon_ss_crc:08X}")
-        if xgd == 4:
+        elif xgd == 4:
             clean_kreon_ss_crc = zlib.crc32(clean_kreon_ss)
             print(f"Redump SS Hash: {clean_kreon_ss_crc:08X}")
             abgx_ss_crc = zlib.crc32(abgx_ss)
