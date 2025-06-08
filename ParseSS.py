@@ -477,7 +477,7 @@ def parse_file(file_path, verbose):
                 print("[WARNING] XGD3 SS matches abgx360 internal hash, bad angles")
         
         if xgd == 1:
-            xgd1_fixed_ss[0x200:0x2CF] = b'\x00' * (0x65F - 0x5FA)
+            xgd1_fixed_ss[0x200:0x2CF] = b'\x00' * (0x2CF - 0x200)
             xgd1_fixed_ss[0x5DF:0x5E7] = b'\x00' * (0x5E7 - 0x5DF)
             xgd1_fixed_ss[0x5FA:0x65F] = b'\x00' * (0x65F - 0x5FA)
         elif xgd == 2:            
