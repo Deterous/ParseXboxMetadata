@@ -12,9 +12,11 @@ def get_xgd_type(ss):
     else:
         return None
 
-def clean_ss(ss, ssv2):
+def clean_ss(ss, ssv2, fix):
     xgd_type = get_xgd_type(ss)
     if xgd_type == 1:
+        if fix:
+            ss[0x200:0x2D0] = b'\x00' * (0x2D0 - 0x200)
         return True
     elif xgd_type == 2:
         ss[552] = 0x01
@@ -64,12 +66,12 @@ def clean_ss(ss, ssv2):
         return True
     return False
 
-def process_file(file_path, ssv2):
+def process_file(file_path, ssv2, fix):
     try:
         if os.path.isfile(file_path) and os.path.getsize(file_path) == 2048:
             with open(file_path, 'rb+') as f:
                 data = bytearray(f.read())
-                if clean_ss(data, ssv2):
+                if clean_ss(data, ssv2, fix):
                     f.seek(0)
                     f.write(data)
                 else:
@@ -79,26 +81,30 @@ def process_file(file_path, ssv2):
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
 
-def process_directory(directory, recursive, ssv2):
+def process_directory(directory, recursive, ssv2, fix):
     for root, _, files in os.walk(directory):
         for name in files:
-            process_file(os.path.join(root, name), ssv2)
+            process_file(os.path.join(root, name), ssv2, fix)
         if not recursive:
             break
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python CleanSS.py <file|directory> [-r|--recursive] [-s|--ssv2]")
+        print("Usage: python CleanSS.py <file|directory> [-r|--recursive] [-s|--ssv2] [-f|--fix]")
+        print("")
+        print("--ssv2 cleans and upgrades the SS to SSv2 format")
+        print("--fix cleans Original Xbox SS that are rarely incorrectly written to by some drives")
         return
 
     path = sys.argv[1]
     recursive = any(arg in ('-r', '--recursive') for arg in sys.argv[2:])
     ssv2 = any(arg in ('-s', '--ssv2') for arg in sys.argv[2:])
+    fix = any(arg in ('-f', '--fix') for arg in sys.argv[2:])
 
     if os.path.isdir(path):
-        process_directory(path, recursive, ssv2)
+        process_directory(path, recursive, ssv2, fix)
     elif os.path.isfile(path):
-        process_file(path, ssv2)
+        process_file(path, ssv2, fix)
     else:
         print(f"Invalid path: {path}")
 
