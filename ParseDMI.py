@@ -1,3 +1,4 @@
+import os
 import sys
 import datetime
 
@@ -50,21 +51,8 @@ def print_trailer(data, verbose):
         print(f"Final Checksum: {int.from_bytes(data[0x7F0:0x800], 'big'):016X}")
 
 
-def main():
-    if len(sys.argv) != 2 and len(sys.argv) != 3:
-        print("Usage: python ParseDMI.py <filename> [-v|--verbose]")
-        return
-    
-    verbose = False
-    filename = sys.argv[1]
-    if len(sys.argv) == 3:
-        if filename == "-v" or filename =="--verbose":
-            verbose = True
-            filename = sys.argv[2]
-        elif sys.argv[2] == "-v" or sys.argv[2] == "--verbose":
-            verbose = True
-    
-    with open(filename, 'rb') as f:
+def parse_file(file_path, verbose):
+    with open(file_path, 'rb') as f:
         data = f.read(2048)
         if len(data) < 2048:
             print("[ERROR] Not a valid XGD2 DMI")
@@ -121,10 +109,54 @@ def main():
             print(f"[ERROR] Not a valid Xbox DMI: First byte is 0x{data[0]:02X}")
             return
 
+
 if __name__ == "__main__":
     try:
-        main()
-    except FileNotFoundError:
-        print(f"[ERROR] File file not found.")
+        if len(sys.argv) < 2 or len(sys.argv) > 5:
+            print("Usage: python ParseDMI.py <filename|directory> [-v|--verbose] [-r|--recursive] [-d|--dmi-only]")
+            print()
+            print("Options:")
+            print("input: file path to parse, or directory of files to parse")
+            print("-v, --verbose\t Prints extra information about DMI")
+            print("-r, --recursive\t Parses all files in dir recursively")
+            print("-d, --dmi-only\t Only parses .bin files in dir that start with DMI")
+            sys.exit(0)
+        
+        input_path = None
+        verbose = False
+        recursive = False
+        dmi_only = False
+        for arg in sys.argv[1:]:
+            if arg in ("-v", "--verbose"):
+                verbose = True
+            elif arg in ("-r", "--recursive"):
+                recursive = True
+            elif arg in ("-d", "--dmi-only"):
+                dmi_only = True
+            else:
+                input_path = arg
+        
+        if not input_path:
+            print("[ERROR] No valid filename provided")
+            sys.exit(0)
+        
+        if os.path.isdir(input_path):
+            if recursive:
+                for root, _, files in os.walk(input_path):
+                    for file in files:
+                        if not dmi_only or (file.startswith("DMI") and file.endswith(".bin")):
+                            file_path = os.path.join(root, file)
+                            print(file_path)
+                            parse_file(file_path, verbose)
+            else:
+                for entry in os.listdir(input_path):
+                    file_path = os.path.join(input_path, entry)
+                    if os.path.isfile(file_path) and (not dmi_only or (os.path.basename(file_path).startswith("DMI") and file_path.endswith(".bin"))):
+                        print(file_path)
+                        parse_file(file_path, verbose)
+        elif os.path.isfile(input_path):
+            parse_file(input_path, verbose)
+        else:
+            print(f"[ERROR] Invalid path: {input_path}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"[ERROR] {e}")
