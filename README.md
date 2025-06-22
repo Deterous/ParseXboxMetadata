@@ -31,7 +31,7 @@ Certificate Version: 2
 
 # ParseDMI
 
-`python ParseDMI.py <filename> [-v, --verbose]`
+`python ParseDMI.py <filename|directory> [-v|--verbose] [-r|--recursive] [-d|--dmi-only]`
 
 Parses Xbox and Xbox360 DMI sector for its useful metadata, e.g.
 
@@ -51,7 +51,7 @@ PFI CRC: 26AF4C58
 
 # ParseSS
 
-`python ParseSS.py <filename|directory> [-v,--verbose] [-r,--recursive] [-s,--ss-only]`
+`python ParseSS.py <filename|directory> [-v|--verbose] [-r|--recursive] [-s|--ss-only]`
 
 Parse Xbox and Xbox360 SS sector for its useful metadata, e.g.
 
