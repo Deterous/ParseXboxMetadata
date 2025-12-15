@@ -31,8 +31,9 @@ def print_trailer(data, verbose):
         bytes.fromhex('6F926559C10CD2DC'): '169EF597',  # Wave 17-18
         bytes.fromhex('07E9C4770C916366'): '032CCF37',  # Wave 19
         bytes.fromhex('0C0BA0C912F3C56D'): 'F48D24B8',  # Wave 20
-        bytes.fromhex('FA4BE3C4BDD34C19'): 'E1647069',  # XGD3 #1 (Halo Reach Preview, Kinect Rush)
-        bytes.fromhex('26FB858A0FC5ED02'): '26AF4C58',  # XGD3 #2
+        bytes.fromhex('6DD35C40F7D0DAE1'): 'D92C9096',  # XGD3 #1 (Halo Reach Beta)
+        bytes.fromhex('FA4BE3C4BDD34C19'): 'E1647069',  # XGD3 #2 (Halo Reach Preview, Kinect Rush)
+        bytes.fromhex('26FB858A0FC5ED02'): '26AF4C58',  # XGD3 (Common)
         bytes.fromhex('CFE8ADB9B0D59CD1'): '26675ADB',  # XGD2 Hybrid (Xbox 360 Trial Disc)
     }
     if pfi in pfi_map:
@@ -160,3 +161,4 @@ if __name__ == "__main__":
             print(f"[ERROR] Invalid path: {input_path}")
     except Exception as e:
         print(f"[ERROR] {e}")
+
