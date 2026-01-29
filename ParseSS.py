@@ -98,13 +98,13 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
     for i in range(16):
         ct = bytes(data[0x304+i*16:0x304+(i+1)*16])
         if i == 15:
-            dcrt[i*16 : (i+1)*16] = ct
+            dcrt[i*16:252] = ct[:12]
         else:
             pt = bytearray(cipher.update(ct))
             for j in range(16):
                 pt[j] ^= iv[j]
             iv[:] = ct
-            dcrt[i*16 : (i+1)*16] = pt
+            dcrt[i*16:(i+1)*16] = pt
     
     enc_response_count = 0
     for i in range(0x304, 0x400, 12):
