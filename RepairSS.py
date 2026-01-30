@@ -153,11 +153,7 @@ def repair_ccrt2(data, xgd, cpr_mai):
     for i, entry in enumerate(rtentry):
         if (good_ss[0x730+i*9] & 0xF0) == 0xF0:
             continue
-
-        good_ss[0x730+i*9] = entry["RT"]
-        good_ss[0x730+i*9+1] = entry["CID"]
-        good_ss[0x730+i*9+2] = entry["Mod"]
-        good_ss[0x730+i*9+3:0x730+i*9+9] = entry["Data"]
+        
         good_ss[offset+i*9:offset+i*9+4] = entry["CD"]
         good_ss[offset+i*9+4:offset+i*9+9] = entry["Response"]
     return good_ss
