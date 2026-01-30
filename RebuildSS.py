@@ -9,9 +9,51 @@ except ImportError:
     raise
 
 
+def clean_ss(ss, xgd):
+    print(f"[INFO] Setting fixed angles")
+    if xgd == 1:
+        return True
+    elif xgd == 2:
+        ss[552] = 0x01
+        ss[553] = 0x00
+        ss[555] = 0x01 if ssv2 else 0x00
+        ss[556] = 0x00
+        ss[561] = 0x5B
+        ss[562] = 0x00
+        ss[564] = 0x5B if ssv2 else 0x00
+        ss[565] = 0x00
+        ss[570] = 0xB5
+        ss[571] = 0x00
+        ss[573] = 0xB5 if ssv2 else 0x00
+        ss[574] = 0x00
+        ss[579] = 0x0F
+        ss[580] = 0x01
+        ss[582] = 0x0F if ssv2 else 0x00
+        ss[583] = 0x01 if ssv2 else 0x00
+        return True
+    elif xgd == 3:
+        ss[72] = 0x01
+        ss[73] = 0x00
+        ss[75] = 0x01
+        ss[76] = 0x00
+        ss[81] = 0x5B
+        ss[82] = 0x00
+        ss[84] = 0x5B
+        ss[85] = 0x00
+        ss[90] = 0xB5
+        ss[91] = 0x00
+        ss[93] = 0xB5
+        ss[94] = 0x00
+        ss[99] = 0x0F
+        ss[100] = 0x01
+        ss[102] = 0x0F
+        ss[103] = 0x01
+        return True
+    return False
+
 def repair_ccrt2(data, xgd, cpr_mai):
     good_ss = bytearray(data)
-
+    
     if xgd == 1:
         return None
     elif xgd == 3:
@@ -160,10 +202,37 @@ def repair_ccrt2(data, xgd, cpr_mai):
         good_ss[0x730+i*9+3:0x730+i*9+9] = entry["Data"]
         good_ss[offset+i*9:offset+i*9+4] = entry["CD"]
         good_ss[offset+i*9+4:offset+i*9+9] = entry["Response"]
+    
+    clean_ss(good_ss, xgd)
+    
     return good_ss
 
 
-def repair_ss(data, xgd):
+def rebuild_ss(data, xgd):
+    # move cpr_mai and trim sector
+    cpr_mai = data[0x007:0x00B]
+    print(f"[INFO] CPR_MAI key of {cpr_mai.hex().upper()}")
+    data = bytearray(data[0x00C:0x80C])
+    if xgd == 3:
+        data[0x0F0:0x0F4] = cpr_mai
+    else:
+        data[0x2D0:0x2D4] = cpr_mai
+
+    # decode SS ranges and copy - thanks to RibShark
+    scramble_indices = data[0x730:0x800]
+    scramble_indices = bytearray(a ^ b for a, b in zip(scramble_indices, cpr_mai * (len(scramble_indices) // 4)))
+
+    ss_range = bytearray(0xCF)
+    ss_range_scrambled = data[0x661:0x730]
+    for i in range(0, len(scramble_indices) - 1):
+        ss_range[i] = ss_range_scrambled[scramble_indices[i]]
+
+    data[0x661:0x730] = ss_range
+    data[0x730:0x7FF] = ss_range
+
+    if xgd < 2:
+        return data
+
     if data[0x300] != 2:
         print(f"[ERROR] Cannot safely repair with unexpected CCRT Version: 0x{data[0x300]:02X}")
         return None
@@ -171,34 +240,29 @@ def repair_ss(data, xgd):
         print(f"[ERROR] Cannot safely repair with unexpected CCRT Count: 0x{data[0x301]:02X}")
         return None
     if data[0x65F] != 0x02:
-        print(f"[ERROR] Cannot safely repair with unexpected value at 0x65F: {data[0x65F]:02X}")
+        print(f"[ERROR] Cannot safely repair with unexpected value at 0x66B: {data[0x65F]:02X}")
         return None
     if data[0x49E] != 0x04:
-        print(f"[ERROR] Cannot safely repair with unexpected value at 0x49E: 0x{data[0x49E]:02X}")
+        print(f"[ERROR] Cannot safely repair with unexpected value at 0x4AA: 0x{data[0x49E]:02X}")
         return None
     if data[0x661:0x730] != data[0x730:0x7FF]:
         print("[ERROR] Cannot safely repair when duplicated SS range does not match")
         return None
-    if xgd == 3:
-        cpr_mai = data[0x0F0:0x0F4]
-    else:
-        cpr_mai = data[0x2D0:0x2D4]
     return repair_ccrt2(data, xgd, cpr_mai)
 
 
-def repair_file(file_path):
+def rebuild_file(file_path):
     with open(file_path, 'rb') as f:
-        data = f.read(2048)
+        data = f.read(2064)
     
-    if len(data) < 2048:
-        print("[ERROR] Not a valid SS: <2048 bytes")
+    if len(data) < 2064:
+        print("[ERROR] Not a valid raw SS: <2064 bytes")
         return
     
     xgd = 0
-    layer0_end = data[13:16]
+    layer0_end = data[0x19:0x1C]
     if layer0_end == bytes([0x20, 0x33, 0xAF]):
-        print("[ERROR] Cannot repair XGD1 SS")
-        return
+        xgd = 1
     elif layer0_end == bytes([0x20, 0x33, 0x9F]):
         xgd = 2
     elif layer0_end == bytes([0x23, 0x8E, 0x0F]):
@@ -207,24 +271,20 @@ def repair_file(file_path):
         print(f"[ERROR] Not a valid SS: Bad layerbreak")
         return
     
-    if xgd == 3 and data[32:104] == b'\x00' * 72:
-        print("[ERROR] Cannot repair bad XGD3 SS")
-        return
-    
     if xgd == 2:
-        empty_ranges = [(0x011, 0x100), (0x11C, 0x200), (0x2CF, 0x2D0), (0x2D4, 0x300), (0x302, 0x304), (0x400, 0x460), (0x470, 0x49E), (0x4A7, 0x4BA), (0x5EB, 0x5FA), (0x7FF, 0x800)]
+        empty_ranges = [(0x01D, 0x10C), (0x128, 0x20C), (0x2DB, 0x2DC), (0x2E0, 0x30C), (0x30E, 0x310), (0x40C, 0x46C), (0x47C, 0x4AA), (0x4B3, 0x4C6), (0x5F7, 0x606)]
         all_zero = all(data[start:end] == b'\x00' * (end - start) for start, end in empty_ranges)
         if not all_zero:
-            print("[ERROR] Cannot safely repair unexpected XGD2")
+            print("[ERROR] Cannot safely rebuild unexpected XGD2")
             return
     elif xgd == 3:
-        empty_ranges = [(0x011, 0x01B), (0x01C, 0x020), (0x0F5, 0x0FF), (0x302, 0x304), (0x400, 0x460), (0x470, 0x49E), (0x4A7, 0x4BA), (0x5EB, 0x5FA), (0x7FF, 0x800)]
+        empty_ranges = [(0x01D, 0x027), (0x028, 0x02C), (0x101, 0x10B), (0x30E, 0x310), (0x40C, 0x46C), (0x47C, 0x4AA), (0x4B3, 0x4C6), (0x5F7, 0x606)]
         all_zero = all(data[start:end] == b'\x00' * (end - start) for start, end in empty_ranges)
         if not all_zero:
-            print("[ERROR] Cannot safely repair unexpected XGD3")
+            print("[ERROR] Cannot safely rebuild unexpected XGD3")
             return
     
-    good_ss = repair_ss(data, xgd)
+    good_ss = rebuild_ss(data, xgd)
     if good_ss is not None:
         with open(file_path, 'wb') as f:
             f.write(good_ss)
@@ -234,12 +294,12 @@ def repair_file(file_path):
 if __name__ == "__main__":
     try:
         if len(sys.argv) < 2 or len(sys.argv) > 4:
-            print("Usage: python RepairSS.py <filename|directory> [-r|--recursive] [-s|--ss-only]")
+            print("Usage: python RebuildSS.py <filename|directory> [-r|--recursive] [-s|--ss-only]")
             print()
             print("Options:")
-            print("input: SS file path to repair, or directory of SS files to repair")
-            print("-r, --recursive\t Repairs all files in dir recursively")
-            print("-s, --ss-only\t Only repairs .bin files in dir that start with SS")
+            print("input: SS file path to rebuild, or directory of SS files to rebuild")
+            print("-r, --recursive\t Rebuilds all files in dir recursively")
+            print("-s, --ss-only\t Only rebuilds .bin files in dir that start with SS")
             sys.exit(0)
         
         input_path = None
@@ -264,15 +324,15 @@ if __name__ == "__main__":
                         if not ss_only or (file.startswith("SS") and file.endswith(".bin")):
                             file_path = os.path.join(root, file)
                             print(file_path)
-                            repair_file(file_path)
+                            rebuild_file(file_path)
             else:
                 for entry in os.listdir(input_path):
                     file_path = os.path.join(input_path, entry)
                     if os.path.isfile(file_path) and (not ss_only or (os.path.basename(file_path).startswith("SS") and file_path.endswith(".bin"))):
                         print(file_path)
-                        repair_file(file_path)
+                        rebuild_file(file_path)
         elif os.path.isfile(input_path):
-            repair_file(input_path)
+            rebuild_file(input_path)
         else:
             print(f"[ERROR] Invalid path: {input_path}")
     except Exception as e:

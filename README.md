@@ -131,3 +131,8 @@ With the `--fix` flag, it will "clean" XGD1 (Original Xbox) SS files by removing
 This performs advanced repairing of SS files using the decrypted challenge table (similar to what [abgx360](https://abgx360.hadzz.com/) does).
 Please read any warnings and messages printed during RepairSS.py and do not trust the output blindly.
 Note that RepairSS.py only works on XGD2 or good XGD3 SS files. It does not work on XGD1 SS or bad XGD3 SS (Kreon).
+
+# RebuildSS
+
+This takes a raw sector (2064-byte sector from lead-out of the Xbox DVD) and descrambles/repairs it into the format that the Kreon/0800 firmware output.
+The output is a redump-style SS that has fixed angles, complete challenge-responses, and should match a cleaned SSv1 from a Kreon or 0800 drive.
