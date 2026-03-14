@@ -29,6 +29,8 @@ Disc Number: 0
 Certificate Version: 2
 ```
 
+**Note**: Another good parser for the XBE format is available at [SabreTools](https://github.com/SabreTools/SabreTools.Serialization/).
+
 # ParseDMI
 
 `python ParseDMI.py <filename|directory> [-v|--verbose] [-r|--recursive] [-d|--dmi-only]`
