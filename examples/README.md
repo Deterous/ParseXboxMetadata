@@ -18,7 +18,17 @@ Microsoft provided an update to the Xbox 360 Console for playing HD DVD discs wi
 
 The Windows PC installer for the Media Center Extender contains a "XboxMcx.xex" file that was executed by the Xbox 360 console when being used as an extender. The file was originally provided by Microsoft as part of the Windows XP Media Center Edition 2005 – Update Rollup 2 [here](https://web.archive.org/web/20100107170854/http://www.xbox.com/en-US/pcsetup/mce05lite.htm). The XEX file itself can be obtained by extracting the `mcrdinstaller/ehd.cab` file within `XboxMCELite-ENU.exe`. The XEX file is identical between language variants of the installer, i.e. the [English](https://web.archive.org/web/20070312113401/http://download.microsoft.com/download/2/8/5/28521E1E-120E-4D05-8310-3E43F2734431/XboxMCELite-ENU.exe) and [German](https://web.archive.org/web/20070128065459/http://download.microsoft.com/download/2/8/E/28E4D44A-AF98-4605-AA93-3AA958E13402/XboxMCELite-DEU.exe) executables contain the same XEX file.
 
-| XEX File Source | XEX File Name | Size | CRC-32 | MD5 | SHA-1 |
+### System Updates
+
+The system update files (aka SU, `su20076000_00000000`) distributed in game discs and other downloads have an XEX file embedded within it that can also be used for testing purposes. 
+
+### Homebrew
+
+There are also many homebrew XEX files available online, however as they were not built by Microsoft they cannot be trusted to be 100% following the XEX file specification, and therefore not useful for testing.
+
+### File Integrity Hashes
+
+| XEX File Source | Filename | Size | CRC-32 | MD5 | SHA-1 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | [`BackCompat_11-2007.zip`](https://web.archive.org/web/20090601195157/http://download.microsoft.com/download/d/1/8/d181ee58-de70-4484-936b-0e9161ccd6b2/BackCompat_11-2007.zip) | `default.xex` | 13271040 | 27ed4d81 | 3fe26e3978dcdf4807fe70cc07b8b119 | e65a8cc0341430829964d71711eee0236df0d856 |
 | [`BackCompat_07-2007.zip`](https://web.archive.org/web/20121029215512/http://download.microsoft.com/download/5/0/8/508cfd6d-ee87-4ceb-837d-4741a99d4155/BackCompat_07-2007.zip) | `default.xex` | 13258752 | 08e81cdb | c2930844b8ddc04578d2d18ea074137e | 5e0ed7fc64bbdf6090b08d174ac53c0125c45ffa |
