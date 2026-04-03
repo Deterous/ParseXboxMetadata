@@ -70,6 +70,7 @@ Inside the zip is a default.xex file (for launching from the CD), as well as fur
 | [`SystemUpdate_14717_CD.zip`](http://download.microsoft.com/download/5/2/C/52C2BB5E-6A58-44FB-BC05-ECF6BC7240C0/SystemUpdate_14717_CD.zip) | 94381093 | e597de57 | 259deef501b4ae37717ebb1940aff716 | 1a655e891924559f6f6f0df82efee491987e2870 |
 | [`SystemUpdate_14699_CD.zip`](http://web.archive.org/web/20120112170359/http://download.microsoft.com/download/A/4/5/A45B1ADC-11E8-4771-AA5F-2D53A2A3B424/SystemUpdate_14699_CD.zip) | 94335588 | ca6bd035 | f46db5e230f1153ff8e15aa75f0589a3 | 742cd20d879957bc5d2ac4a430f9c7246ec0d4d6 |
 | [`SystemUpdate_13604_CD.zip`](http://download.microsoft.com/download/0/1/3/01350ECA-1B12-4920-8E47-80F9CC9F160F/SystemUpdate13604CD.zip) | - | - | - | - |
+| [`SystemUpdate_13599_CD.zip`](http://download.microsoft.com/download/2/A/C/2AC6BB6F-1A26-4784-BA64-09A96E70CD03/SystemUpdate_13599_CD.zip) | 100938651 | a9a3016b | e0497b34977e2560eaab3a107e379642 | 6afb1f46003b3f53eeab97bddc423ca93050c440 |
 | [`SystemUpdate_13146_CD.zip`](http://download.microsoft.com/download/C/B/4/CB4136B7-A0A4-4067-ABE6-D789DF16800F/SystemUpdate_13146_CD.zip) | 100449225 | d5da256f | 2dbccdb830c02b84df338ca7f3e8b87b | 82aa525e28019cabdc83105ad24e0a53d579e5ca |
 | [`SystemUpdate_12625_CD.zip`](http://web.archive.org/web/20130706010811/http://download.microsoft.com/download/4/B/5/4B502530-BC35-4477-B25A-AEFDCFB7F504/SystemUpdate_12625_CD.zip) | 99799577 | 38c36670 | 3dfb07b1cce63519295b870b34b6c3c3 | 5cb16914b98a9b26bc1161ba34e5feb1ab8f7a06 |
 
