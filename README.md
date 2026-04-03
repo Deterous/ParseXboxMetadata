@@ -9,6 +9,8 @@ This repository has scripts that read, validate and parse metadata from the foll
 TODO:
 - XEX (Xbox 360 executable file)
 
+For testing/education/research purposes, you may also use the [example files](/examples) provided in this repository.
+
 # ParseXBE
 
 `python ParseXBE.py <filename.xbe>`
