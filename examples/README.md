@@ -37,16 +37,13 @@ Microsoft provided an update to the Xbox 360 Console for playing HD DVD discs wi
 
 The Windows PC installer for the Media Center Extender contains a "XboxMcx.xex" file that was executed by the Xbox 360 console when being used as an extender. The file was originally provided by Microsoft as part of the Windows XP Media Center Edition 2005 – Update Rollup 2 [here](https://web.archive.org/web/20100107170854/http://www.xbox.com/en-US/pcsetup/mce05lite.htm). The XEX file itself can be obtained by extracting the `mcrdinstaller/ehd.cab` file within `XboxMCELite-ENU.exe`. The XEX file is identical between language variants of the installer, i.e. the [English](https://web.archive.org/web/20070312113401/http://download.microsoft.com/download/2/8/5/28521E1E-120E-4D05-8310-3E43F2734431/XboxMCELite-ENU.exe) and [German](https://web.archive.org/web/20070128065459/http://download.microsoft.com/download/2/8/E/28E4D44A-AF98-4605-AA93-3AA958E13402/XboxMCELite-DEU.exe) executables contain the same XEX file.
 
+Windows Vista and Windows 7 installations also come bundled with the Xbox Media Center Extender XEX files, and can be found within the `C:\Windows\ehome\MCX\X02\` folder. It may be obtained from the Windows Vista/7 `install.wim` file during installation, or from the installation ISOs distributed by Microsoft (by extracting the `\sources\install.wim` file). The XEX file itself is within the `\Windows\ehome\MCX\X02\` folder of the WIM file.
+
 | XEX File Source | Filename | Size | CRC-32 | MD5 | SHA-1 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | [`XboxMCELite-ENU.exe`](https://web.archive.org/web/20070312113401/http://download.microsoft.com/download/2/8/5/28521E1E-120E-4D05-8310-3E43F2734431/XboxMCELite-ENU.exe) | [`XboxMcx.xex`](xex/XboxMCELite-ENU/XboxMcx.xex) | 5038080 | 9836809f | 0f3ac0bd6ad303e236fb3f282f4b1bd8 | 7968131eff8e14796326e43c7b1f4c419f4215ca |
-
-Windows Vista and Windows 7 installations also come bundled with the Xbox Media Center Extender XEX files, and can be found within the `/sources/install.wim` file of their installation ISOs.
-
-| XEX File Source | Filename | Size | CRC-32 | MD5 | SHA-1 |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Windows Vista install.wim:/Windows/ehome/MCX/X02/ | [`XboxMCX-V.XEX`](xex/Windows_Vista/XboxMVX-V.XEX) | 6443008 | 9253d4ef | 5510ba471080969134def8afde247385 | 6689fee06c60f44c5e8e02fa70720783bd9c2ecb |
-| Windows 7 install.wim:/Windows/ehome/MCX/X02/ | [`XboxMCX-V.XEX`](xex/Windows_7/XboxMVX.XEX) | 6918144 | 512bc07d | a05d52ee3e5e833f016c491ebf65e2f1 | de88644ea8159ea80dcc6dc4b60c2172abb31bbf |
+| [`install.wim`](http://msft-dnl.digitalrivercontent.net/msvista/pub/msshus/vista32/install.wim) (Windows Vista) | [`XboxMCX-V.XEX`](xex/Windows_Vista/XboxMCX-V.XEX) | 6443008 | 9253d4ef | 5510ba471080969134def8afde247385 | 6689fee06c60f44c5e8e02fa70720783bd9c2ecb |
+| [`install.wim`](http://msft.digitalrivercontent.net/win/X17-58996.iso) (Windows 7) | [`XboxMCX-V.XEX`](xex/Windows_7/XboxMCX-V.XEX) | 6918144 | 512bc07d | a05d52ee3e5e833f016c491ebf65e2f1 | de88644ea8159ea80dcc6dc4b60c2172abb31bbf |
 
 ### System Update CD
 
@@ -96,6 +93,25 @@ Inside the zip is a default.xex file (for launching from the CD), and it is iden
 ### System Updates
 
 The system update file itself (`su20076000_00000000`) distributed in game discs and other downloads such as the ones above have XEX files embedded within it that can also be used for testing purposes.
+
+### Xbox 360 SDK
+
+The Xbox 360 SDK "Xbox 360 Neighborhood" from Microsoft for use with Xbox 360 development kits also came bundled with official XEX files. The SDK was not distributed freely and so these files are not included in this repository, but a list of all the XEX files and their hashes that were bundled in the SDK 21256.3 installer are shown below.
+
+| Folder | Filename | Size | CRC-32 | MD5 | SHA-1 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `\bin\win32\` | `AvatarPreviewerXbox.xex` | 6750208 | 6613f8b5 | c84dbc480cb0d98b1a27817f357ed9ce | badd4a11dfd058debd0625a245a2d99858556fad |
+| `\bin\win32\` | `pixie.xex` | 696320 | 249cc711 | 5e0444b1e10a60040c6e16cc270a0c4d | ee49131acb61316eb38933e87a2fc5c022274aef |
+| `\bin\win32\` | `XedSkeletonUpdater.xex` | 696320 | da34ecfd | 9dac82ebe7b61e3a24450aeb3b69b42d | fc3aee32d8e51a229b02f1c215e60e09edec72f0 |
+| `\bin\win32\` | `XedSkeletonUpdater_preview.xex` | 696320 | 5c23a493 | ff87f9351ab7ad2e123021304c22c264 | 11a13586551c483a890cc2ea320d5c0bc272e479 |
+| `\bin\win32\VisualGestureBuilderPreview\` | `VisualGestureBuilderPreview.xex` | 4038656 | c80fde6f | 47b963f81b72b9d658f7b8b95c03211c | 44c6fca4d0639d1a18776ca75ba651f601e19de4 |
+| `\bin\xbox\` | `xnetconfig.xex` | 1073152 | 0399b33f | 3d9ceed6f0fb2e71687445b0e0ad5406 | c20bc36f7532d5b0d72886d4861dc0d6c4c77f3b |
+| `\bin\xbox\` | `demofixer.xex` | 69632 | 168ce36f | 632ada41e78b8289506bc233a3bbe994 | dabf433456baa2fa9929cfc4120180a68076e388 |
+| `\bin\xbox\` | `finished.xex` | 266240 | e49098dd | 8179e562ece21cdbe2226815f08f5617 | 5033c9745c41822c518f420c2adbe62e5d357891 |
+| `\bin\xbox\ExpansionInstaller` | `ExpansionInstaller.xex` | 4931584 | 089fa3ac | ee0426f985670b2f97f05f0ff8f57fec | c67efab4cd036b487c926d4bda95125783eb21ee |
+| `\bin\xbox\playready` | `PlayReady.xex` | 1466368 | ab50d9db | c32e9bc7a5eb0704eb2e031d4055ee51 | b14b1ee65ba89a06d7a331c2b544aef5191efc9f |
+| `\bin\xbox\graphics\EffectEdit` | `effecteditclient.xex` | 3317760 | eabc50d3 | ad91bbcda4d2d035164b67b79683c867 | 391ced1f32cb1e5f35f2576f30b52e04db9b35cd |
+| `\bin\xbox\ui\UIAuditioning` | `UIAuditioning.xex` | 5644288 | ef426dba | 4d79b63132596d6cdf71be585a29c906 | e5336a44d9bb3ee5bcca637e8443c7292cb4f4e1 |
 
 ### Homebrew
 
