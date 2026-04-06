@@ -42,6 +42,7 @@ Windows Vista and Windows 7 installations also come bundled with the Xbox Media 
 | XEX File Source | Filename | Size | CRC-32 | MD5 | SHA-1 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | [`XboxMCELite-ENU.exe`](https://web.archive.org/web/20070312113401/http://download.microsoft.com/download/2/8/5/28521E1E-120E-4D05-8310-3E43F2734431/XboxMCELite-ENU.exe) | [`XboxMcx.xex`](xex/XboxMCELite-ENU/XboxMcx.xex) | 5038080 | 9836809f | 0f3ac0bd6ad303e236fb3f282f4b1bd8 | 7968131eff8e14796326e43c7b1f4c419f4215ca |
+| `install.wim` (Windows Vista Beta 2) | [`XboxMCX-V.XEX`](xex/Windows_Vista_Beta2/XboxMCX-V.XEX) | 5361664 | a01c2c57 | a8ff70721cc8fd5a5c6dff7b4ec71cf1 | 94e5a282f358bc61e333b42c2c77037ba711def0 |
 | [`install.wim`](http://msft-dnl.digitalrivercontent.net/msvista/pub/msshus/vista32/install.wim) (Windows Vista) | [`XboxMCX-V.XEX`](xex/Windows_Vista/XboxMCX-V.XEX) | 6443008 | 9253d4ef | 5510ba471080969134def8afde247385 | 6689fee06c60f44c5e8e02fa70720783bd9c2ecb |
 | [`install.wim`](http://msft.digitalrivercontent.net/win/X17-58996.iso) (Windows 7) | [`XboxMCX-V.XEX`](xex/Windows_7/XboxMCX-V.XEX) | 6918144 | 512bc07d | a05d52ee3e5e833f016c491ebf65e2f1 | de88644ea8159ea80dcc6dc4b60c2172abb31bbf |
 
