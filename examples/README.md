@@ -97,22 +97,7 @@ The system update file itself (`su20076000_00000000`) distributed in game discs 
 
 ### Xbox 360 SDK
 
-The Xbox 360 SDK "Xbox 360 Neighborhood" from Microsoft for use with Xbox 360 development kits also came bundled with official XEX files. The SDK was not distributed freely and so these files are not included in this repository, but a list of all the XEX files and their hashes that were bundled in the SDK 21256.3 installer are shown below. Earlier XDK software was also bundled with prebuilt XEX files, as early as build number 1332 (March 2005). Early XEX files are incompatible, with file signatures "XEX0", "XEX1", or "XEX?".
-
-| Folder | Filename | Size | CRC-32 | MD5 | SHA-1 |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `\bin\win32\` | `AvatarPreviewerXbox.xex` | 6750208 | 6613f8b5 | c84dbc480cb0d98b1a27817f357ed9ce | badd4a11dfd058debd0625a245a2d99858556fad |
-| `\bin\win32\` | `pixie.xex` | 696320 | 249cc711 | 5e0444b1e10a60040c6e16cc270a0c4d | ee49131acb61316eb38933e87a2fc5c022274aef |
-| `\bin\win32\` | `XedSkeletonUpdater.xex` | 696320 | da34ecfd | 9dac82ebe7b61e3a24450aeb3b69b42d | fc3aee32d8e51a229b02f1c215e60e09edec72f0 |
-| `\bin\win32\` | `XedSkeletonUpdater_preview.xex` | 696320 | 5c23a493 | ff87f9351ab7ad2e123021304c22c264 | 11a13586551c483a890cc2ea320d5c0bc272e479 |
-| `\bin\win32\VisualGestureBuilderPreview\` | `VisualGestureBuilderPreview.xex` | 4038656 | c80fde6f | 47b963f81b72b9d658f7b8b95c03211c | 44c6fca4d0639d1a18776ca75ba651f601e19de4 |
-| `\bin\xbox\` | `xnetconfig.xex` | 1073152 | 0399b33f | 3d9ceed6f0fb2e71687445b0e0ad5406 | c20bc36f7532d5b0d72886d4861dc0d6c4c77f3b |
-| `\bin\xbox\` | `demofixer.xex` | 69632 | 168ce36f | 632ada41e78b8289506bc233a3bbe994 | dabf433456baa2fa9929cfc4120180a68076e388 |
-| `\bin\xbox\` | `finished.xex` | 266240 | e49098dd | 8179e562ece21cdbe2226815f08f5617 | 5033c9745c41822c518f420c2adbe62e5d357891 |
-| `\bin\xbox\ExpansionInstaller` | `ExpansionInstaller.xex` | 4931584 | 089fa3ac | ee0426f985670b2f97f05f0ff8f57fec | c67efab4cd036b487c926d4bda95125783eb21ee |
-| `\bin\xbox\playready` | `PlayReady.xex` | 1466368 | ab50d9db | c32e9bc7a5eb0704eb2e031d4055ee51 | b14b1ee65ba89a06d7a331c2b544aef5191efc9f |
-| `\bin\xbox\graphics\EffectEdit` | `effecteditclient.xex` | 3317760 | eabc50d3 | ad91bbcda4d2d035164b67b79683c867 | 391ced1f32cb1e5f35f2576f30b52e04db9b35cd |
-| `\bin\xbox\ui\UIAuditioning` | `UIAuditioning.xex` | 5644288 | ef426dba | 4d79b63132596d6cdf71be585a29c906 | e5336a44d9bb3ee5bcca637e8443c7292cb4f4e1 |
+The Xbox 360 SDK from Microsoft for use with Xbox 360 development kits also came bundled with official XEX files. The SDK was not distributed freely and so these files are not included in this repository. Early XEX files are incompatible with the "XEX2" standard format XEX files, with file signatures "XEX0" (March 2005, XDK build 1332), "XEX?" (April-May 2005, XDK build 1434-1538), "XEX-" (June 2005, XDK build 1640), and "XEX1" (August 2005, XDK build 1838).
 
 ### Homebrew
 
