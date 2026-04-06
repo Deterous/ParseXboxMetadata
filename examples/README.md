@@ -97,7 +97,7 @@ The system update file itself (`su20076000_00000000`) distributed in game discs 
 
 ### Xbox 360 SDK
 
-The Xbox 360 SDK "Xbox 360 Neighborhood" from Microsoft for use with Xbox 360 development kits also came bundled with official XEX files. The SDK was not distributed freely and so these files are not included in this repository, but a list of all the XEX files and their hashes that were bundled in the SDK 21256.3 installer are shown below.
+The Xbox 360 SDK "Xbox 360 Neighborhood" from Microsoft for use with Xbox 360 development kits also came bundled with official XEX files. The SDK was not distributed freely and so these files are not included in this repository, but a list of all the XEX files and their hashes that were bundled in the SDK 21256.3 installer are shown below. Earlier XDK software was also bundled with prebuilt XEX files, as early as build number 1332 (March 2005). Early XEX files are incompatible, with file signatures "XEX0", "XEX1", or "XEX?".
 
 | Folder | Filename | Size | CRC-32 | MD5 | SHA-1 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
