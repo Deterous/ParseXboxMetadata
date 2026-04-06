@@ -1,13 +1,10 @@
 This repository has scripts that read, validate and parse metadata from the following files:
-- XBE (XBox eXecutable), Xbox only
-    - XBE files (`filename.xbe`) can be extracted from Xbox game partitions, using programs such as [extract-xiso](https://github.com/XboxDev/extract-xiso) or [NKit2](https://github.com/Nanook/NKit)
-- DMI (Disc Manufacturing Information sector), Xbox and Xbox 360
+- XBE (Xbox Executable) and XEX (Xenon/Xbox360 Executable)
+    - XBE files (`filename.xbe`) and XEX files (`filename.xex`) can be extracted from Xbox game partitions (XDVDFS) or redump ISOs, using programs such as [SabreTools ExtractionTool](https://github.com/SabreTools/SabreTools.Serialization), [extract-xiso](https://github.com/XboxDev/extract-xiso), or [NKit2](https://github.com/Nanook/NKit)
+- DMI (Disc Manufacturing Information sector)
     - DMI files (e.g. `DMI.bin` or `filename.dmi`) can be obtained from the SCSI command READ DISC STRUCTURE using dumping programs such as [Redumper](https://github.com/superg/redumper), [DiscImageCreator](https://github.com/saramibreak/DiscImageCreator/), and XboxBackupCreator
-- SS (Security Sector), Xbox and Xbox 360
+- SS (Security Sector)
     - SS files (e.g. `SS.bin` or `filename.ss`) can be obtained from specific disc drives using dumping programs such as [Redumper](https://github.com/superg/redumper), [DiscImageCreator](https://github.com/saramibreak/DiscImageCreator/), and XboxBackupCreator
-
-TODO:
-- XEX (Xbox 360 executable file)
 
 For testing/education/research purposes, you may also use the [example files](/examples) provided in this repository.
 
@@ -31,7 +28,22 @@ Disc Number: 0
 Certificate Version: 2
 ```
 
-**Note**: Another good parser for the XBE format is available at [SabreTools](https://github.com/SabreTools/SabreTools.Serialization/).
+**Note**: A more verbose parser for the XBE format is available at [SabreTools](https://github.com/SabreTools/SabreTools.Serialization/).
+
+# ParseXEX
+
+`python ParseXEX.py <filename.xex>`
+
+Parses Xbox XEX files for their useful metadata, e.g.
+
+```
+Media ID: 77751590BCEFA203731B6A07-0E6FB1CE
+Region: 0000FD00 (NTSC/J, Excluding China)
+```
+
+**TODO**: Parse more useful fields such as game name, disc number, ratings, allowed media.
+
+**Note**: A more verbose parser for the XEX format is available at [SabreTools](https://github.com/SabreTools/SabreTools.Serialization/).
 
 # ParseDMI
 
