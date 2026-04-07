@@ -41,7 +41,7 @@ Media ID: 77751590BCEFA203731B6A07-0E6FB1CE
 Region: 0000FD00 (NTSC/J, Excluding China)
 ```
 
-**TODO**: Parse more useful fields such as game name, disc number, ratings, allowed media.
+**TODO**: Parse more useful fields such as timestamp, disc number, ratings, allowed media.
 
 **Note**: A more verbose parser for the XEX format is available at [SabreTools](https://github.com/SabreTools/SabreTools.Serialization/).
 
