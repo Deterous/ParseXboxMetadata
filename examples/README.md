@@ -97,7 +97,7 @@ The system update file itself (`su20076000_00000000`) distributed in game discs 
 
 ### Xbox 360 SDK
 
-The Xbox 360 SDK from Microsoft for use with Xbox 360 development kits also came bundled with official XEX files. The SDK was not distributed freely and so these files are not included in this repository. Early XEX files are incompatible with the "XEX2" standard format XEX files, with file signatures "XEX0" (March 2005, XDK build 1332), "XEX?" (April-May 2005, XDK build 1434-1538), "XEX-" (June 2005, XDK build 1640), and "XEX1" (August 2005, XDK build 1838).
+The Xbox 360 SDK from Microsoft for use with Xbox 360 development kits also came bundled with official XEX files. The SDK was not distributed freely and so these files are not included in this repository. Early XEX files are incompatible with the "XEX2" standard format XEX files, with file signatures "XEX0" (March 2005, XDK build 1332), "XEX?" (April-May 2005, XDK build 1434-1538), "XEX-" (June 2005, XDK build 1640), "XEX%" (July 2005, XDK build 1746), and "XEX1" (August 2005, XDK build 1838).
 
 ### Homebrew
 
