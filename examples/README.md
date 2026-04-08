@@ -65,7 +65,7 @@ Inside the zip is a default.xex file (for launching from the CD), and it is iden
 | Filename | Size | CRC-32 | MD5 | SHA-1 |
 | :--- | :--- | :--- | :--- | :--- |
 | [`SystemUpdate_17559_CD.zip`](https://download.microsoft.com/download/8/f/4/8f456817-e264-4207-9b95-6efc990fee98/SystemUpdate_17559_CD.zip) | 116485962 | ff04d5db | 18a286e022f8d67051279336ce2817fc | 02da5078af44b5e78feca108a439c36ab6af1270 |
-| [`System_update_17544_CD.zip`](https://download.microsoft.com/download/2/e/4/2e457a41-d7d5-4403-888e-07d9a3a914aa/SystemUpdate_17544_CD.zip) | 116484466 | aad63204 | 71a7d9bf96a68dbe48feb34f034507cc | 19cf78701ca79dbe4e4f397e32c5da5405796f5c |
+| [`SystemUpdate_17544_CD.zip`](https://download.microsoft.com/download/2/e/4/2e457a41-d7d5-4403-888e-07d9a3a914aa/SystemUpdate_17544_CD.zip) | 116484466 | aad63204 | 71a7d9bf96a68dbe48feb34f034507cc | 19cf78701ca79dbe4e4f397e32c5da5405796f5c |
 | [`SystemUpdate_17526_CD.zip`](http://download.microsoft.com/download/F/F/4/FF41F147-CE31-4665-A71B-83F00C0940B8/SystemUpdate_17526_CD.zip) | 116476066 | 1c98b58c | 11ac4bd2f1baee2f25cf9fec91386239 | 2ab022024d8fc404397e80778ea3f54c267cb046 |
 | [`SystemUpdate_17511_CD.zip`](http://web.archive.org/web/20170515054013/http://download.microsoft.com/download/D/E/F/DEF05D37-65B5-4EB4-8E1C-EC9B8AB21A32/SystemUpdate_17511_CD.zip) | 116477860 | 8cf2489f | 1657f842efaf0d3100ab6c79aac479b7 | 2514c94dfd11ca1882d3c2c65798358684d9acb3 |
 | [`SystemUpdate_17502_CD.zip`](http://web.archive.org/web/20250329210259/https://download.microsoft.com/download/3/E/B/3EBDD477-ADB7-4171-A294-AD427D169DF9/SystemUpdate_17502_CD.zip) | 116480811 | fcdac5fb | 9ee93a3458b939c222e1fc71a5a4b473 | 0f4f1b729f7eb32a60bebadc96406a4084ca6e55 |
