@@ -89,7 +89,7 @@ Inside the zip is a default.xex file (for launching from the CD), and it is iden
 | [`SystemUpdate_13599_CD.zip`](http://download.microsoft.com/download/2/A/C/2AC6BB6F-1A26-4784-BA64-09A96E70CD03/SystemUpdate_13599_CD.zip) | 100938651 | a9a3016b | e0497b34977e2560eaab3a107e379642 | 6afb1f46003b3f53eeab97bddc423ca93050c440 |
 | [`SystemUpdate_13146_CD.zip`](http://download.microsoft.com/download/C/B/4/CB4136B7-A0A4-4067-ABE6-D789DF16800F/SystemUpdate_13146_CD.zip) | 100449225 | d5da256f | 2dbccdb830c02b84df338ca7f3e8b87b | 82aa525e28019cabdc83105ad24e0a53d579e5ca |
 | [`SystemUpdate_12625_CD.zip`](http://web.archive.org/web/20130706010811/http://download.microsoft.com/download/4/B/5/4B502530-BC35-4477-B25A-AEFDCFB7F504/SystemUpdate_12625_CD.zip) | 99799577 | 38c36670 | 3dfb07b1cce63519295b870b34b6c3c3 | 5cb16914b98a9b26bc1161ba34e5feb1ab8f7a06 |
-| [`systemupdate`](http://download.microsoft.com/download/1/4/6/146DC573-E0D9-4357-9D85-5A7DEC443050/systemupdate.zip) (12611) | 99783223 | f2bc8de5 | c49cd9667ba602addfd94f48005bcd63 | 8370a9d51d2eb59fc943969ba047e7c48a8a64cf |
+| [`systemupdate.zip`](http://download.microsoft.com/download/1/4/6/146DC573-E0D9-4357-9D85-5A7DEC443050/systemupdate.zip) (12611) | 99783223 | f2bc8de5 | c49cd9667ba602addfd94f48005bcd63 | 8370a9d51d2eb59fc943969ba047e7c48a8a64cf |
 
 **Note**: The `_USB.zip` versions of these system updates are equivalent to the CD packages, but without the default.xex file.
 
