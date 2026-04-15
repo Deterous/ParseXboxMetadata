@@ -195,7 +195,11 @@ def parse_ccrt2(data, xgd, cpr_mai, verbose):
             if crt['CID'] == entry['CID']:
                 if (crt['CT'] == 0x15 and entry['RT'] != 0x01) or (crt['CT'] == 0x14 and entry['RT'] != 0x03) or (crt['CT'] == 0x25 and entry['RT'] != 0x05) or (crt['CT'] == 0x24 and entry['RT'] != 0x07):
                     print("[WARNING] Mismatched CT/RT")
-                if crt['CT'] != 0xE0 and crt['CT'] != 0x01:
+                if crt['CT'] == 0xE0 or crt['CT'] == 0x01:
+                    # These fields are usually zeroed
+                    if entry['Response'] != b'\x00\x00\x00\x00\x00':
+                        print(f"[WARNING] Unexpected non-zero data in challenge {crt['CT']:02X}")
+                else:
                     if crt['CT'] == 0x24 or crt['CT'] == 0x25:
                         # Deal with angle measurements differently
                         zeroed_angles = False
